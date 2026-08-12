@@ -3,8 +3,6 @@ import { useState, type FormEvent } from "react";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import {
   CATEGORIES,
   DEFAULT_PRODUCTS,
@@ -18,12 +16,12 @@ import {
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "لوحة الإدارة | متجر A & M" },
+      { title: "لوحة الإدارة | متجر A @ M" },
       {
         name: "description",
-        content: "إدارة كتالوجات متجر A & M: إضافة المنتجات وصورها وتفاصيلها وبيانات التواصل.",
+        content: "إدارة كتالوجات متجر A @ M: إضافة المنتجات وصورها وتفاصيلها وبيانات التواصل.",
       },
-      { property: "og:title", content: "لوحة الإدارة | متجر A & M" },
+      { property: "og:title", content: "لوحة الإدارة | متجر A @ M" },
       {
         property: "og:description",
         content: "إضافة وتعديل كتالوجات المنتجات وبيانات المتجر.",
@@ -84,7 +82,6 @@ function Admin() {
 
   return (
     <div className="min-h-screen bg-background">
-      <SiteHeader />
       <main className="mx-auto max-w-6xl px-4 py-10">
         <h1 className="font-display text-3xl font-bold">لوحة الإدارة</h1>
         <p className="mt-2 text-sm text-muted-foreground">
@@ -272,7 +269,7 @@ function Admin() {
           </div>
         </div>
       </main>
-      <SiteFooter />
+      
     </div>
   );
 }

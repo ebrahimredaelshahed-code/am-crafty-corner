@@ -12,13 +12,13 @@ export function SiteFooter() {
         <div>
           <img
             src={logo}
-            alt="شعار A & M"
+            alt="شعار A @ M"
             loading="lazy"
             width={72}
             height={72}
             className="h-18 w-18 object-contain"
           />
-          <h2 className="mt-3 font-display text-xl font-bold text-primary">A &amp; M</h2>
+          <h2 className="mt-3 font-display text-xl font-bold text-primary">A @ M</h2>
           <p className="mt-2 text-sm leading-7 text-muted-foreground">{settings.about}</p>
         </div>
 
@@ -51,7 +51,7 @@ export function SiteFooter() {
         </div>
       </div>
       <div className="border-t border-border/70 py-4 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} A &amp; M — جميع الحقوق محفوظة
+        © {new Date().getFullYear()} A @ M — جميع الحقوق محفوظة
       </div>
     </footer>
   );

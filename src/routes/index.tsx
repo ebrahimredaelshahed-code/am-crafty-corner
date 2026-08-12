@@ -9,13 +9,13 @@ import { CATEGORIES, useProducts, useSettings, type CategoryId } from "@/lib/sto
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "A & M | متجر المشغولات اليدوية — كروشيه ومكرميه وشنط" },
+      { title: "A @ M | متجر المشغولات اليدوية — كروشيه ومكرميه وشنط" },
       {
         name: "description",
         content:
-          "متجر A & M للمشغولات اليدوية: كتالوجات كروشيه ومكرميه وشنط بتصميمات مميزة، اطلب منتجك مباشرة عبر واتساب.",
+          "متجر A @ M للمشغولات اليدوية: كتالوجات كروشيه ومكرميه وشنط بتصميمات مميزة، اطلب منتجك مباشرة عبر واتساب.",
       },
-      { property: "og:title", content: "A & M | متجر المشغولات اليدوية" },
+      { property: "og:title", content: "A @ M | متجر المشغولات اليدوية" },
       {
         property: "og:description",
         content: "كروشيه ومكرميه وشنط هاند ميد، والطلب مباشرة عبر واتساب.",
@@ -39,7 +39,7 @@ function Home() {
       <main className="mx-auto max-w-6xl px-4">
         <section className="py-14 text-center">
           <h1 className="font-display text-3xl font-bold leading-relaxed text-foreground md:text-5xl">
-            أهلاً بيكِ في متجر <span className="text-primary">A &amp; M</span>
+            أهلاً بيكِ في متجر <span className="text-primary">A @ M</span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
             كل قطعة هنا مشغولة بالإيد بحب واهتمام… اختاري التبويب اللي يعجبك واستعرضي

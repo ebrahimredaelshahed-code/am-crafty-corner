@@ -38,7 +38,7 @@ export const DEFAULT_SETTINGS: Settings = {
   instagram: "https://instagram.com",
   tiktok: "https://tiktok.com",
   about:
-    "A & M متجر متخصص في المشغولات اليدوية من الكروشيه والمكرميه والشنط، كل قطعة تُصنع يدويًا بخامات مختارة بعناية وبلمسة خاصة تناسب ذوقك.",
+    "A @ M متجر متخصص في المشغولات اليدوية من الكروشيه والمكرميه والشنط، كل قطعة تُصنع يدويًا بخامات مختارة بعناية وبلمسة خاصة تناسب ذوقك.",
 };
 
 export const DEFAULT_PRODUCTS: Product[] = [
@@ -120,7 +120,7 @@ export function buildWhatsappLink(product: Product, whatsapp: string) {
     : origin + product.image;
 
   const message = [
-    "السلام عليكم، أرغب في طلب المنتج التالي من متجر A & M:",
+    "السلام عليكم، أرغب في طلب المنتج التالي من متجر A @ M:",
     "",
     `اسم المنتج: ${product.name}`,
     `النوع: ${categoryLabel(product.category)}`,
