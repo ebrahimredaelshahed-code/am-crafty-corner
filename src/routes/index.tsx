@@ -1,24 +1,94 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useState } from "react";
 
-// No head() here: the home route inherits title/description/og/twitter from
-// __root.tsx, and ships no og:image so serve-time hosting can inject the
-// project's social preview (explicit og:image or latest screenshot).
+import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
+import { ProductCard } from "@/components/ProductCard";
+import { CATEGORIES, useProducts, useSettings, type CategoryId } from "@/lib/store";
+
 export const Route = createFileRoute("/")({
-  component: Index,
+  head: () => ({
+    meta: [
+      { title: "A & M | متجر المشغولات اليدوية — كروشيه ومكرميه وشنط" },
+      {
+        name: "description",
+        content:
+          "متجر A & M للمشغولات اليدوية: كتالوجات كروشيه ومكرميه وشنط بتصميمات مميزة، اطلب منتجك مباشرة عبر واتساب.",
+      },
+      { property: "og:title", content: "A & M | متجر المشغولات اليدوية" },
+      {
+        property: "og:description",
+        content: "كروشيه ومكرميه وشنط هاند ميد، والطلب مباشرة عبر واتساب.",
+      },
+    ],
+  }),
+  component: Home,
 });
 
-// IMPORTANT: Replace this placeholder. See ./README.md for routing conventions.
-function Index() {
+function Home() {
+  const { products } = useProducts();
+  const { settings } = useSettings();
+  const [active, setActive] = useState<CategoryId>("crochet");
+
+  const visible = products.filter((p) => p.category === active);
+
   return (
-    <div
-      className="flex min-h-screen items-center justify-center"
-      style={{ backgroundColor: "#fcfbf8" }}
-    >
-      <img
-        data-lovable-blank-page-placeholder="REMOVE_THIS"
-        src="https://cdn.gpteng.co/blank-app-v1.svg"
-        alt="Your app will live here!"
-      />
+    <div className="min-h-screen bg-background">
+      <SiteHeader />
+
+      <main className="mx-auto max-w-6xl px-4">
+        <section className="py-14 text-center">
+          <h1 className="font-display text-3xl font-bold leading-relaxed text-foreground md:text-5xl">
+            أهلاً بيكِ في متجر <span className="text-primary">A &amp; M</span>
+          </h1>
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
+            كل قطعة هنا مشغولة بالإيد بحب واهتمام… اختاري التبويب اللي يعجبك واستعرضي
+            الكتالوجات، والطلب يوصلنا مباشرة على الواتساب.
+          </p>
+        </section>
+
+        <nav
+          aria-label="تبويبات عرض المنتجات"
+          className="mx-auto flex w-fit flex-wrap justify-center gap-2 rounded-full border border-border bg-secondary/70 p-2"
+        >
+          {CATEGORIES.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              onClick={() => setActive(cat.id)}
+              aria-pressed={active === cat.id}
+              className={
+                "rounded-full px-6 py-2.5 text-sm font-semibold transition-colors " +
+                (active === cat.id
+                  ? "bg-primary text-primary-foreground"
+                  : "text-muted-foreground hover:bg-background")
+              }
+            >
+              {cat.label}
+            </button>
+          ))}
+        </nav>
+
+        <section className="mt-10">
+          {visible.length === 0 ? (
+            <p className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
+              لا توجد منتجات في هذا التبويب حاليًا، تابعينا قريبًا.
+            </p>
+          ) : (
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {visible.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  whatsapp={settings.whatsapp}
+                />
+              ))}
+            </div>
+          )}
+        </section>
+      </main>
+
+      <SiteFooter />
     </div>
   );
 }
