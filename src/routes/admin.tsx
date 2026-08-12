@@ -269,7 +269,7 @@ function Admin() {
           </div>
         </div>
       </main>
-      <SiteFooter />
+      
     </div>
   );
 }
