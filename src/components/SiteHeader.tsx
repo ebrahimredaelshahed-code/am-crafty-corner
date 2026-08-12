@@ -8,14 +8,14 @@ export function SiteHeader() {
         <Link to="/" className="flex items-center gap-3">
           <img
             src={logo}
-            alt="شعار متجر A & M للمشغولات اليدوية"
+            alt="شعار متجر A @ M للمشغولات اليدوية"
             width={56}
             height={56}
             className="h-14 w-14 object-contain"
           />
           <span className="leading-tight">
             <span className="block font-display text-2xl font-bold tracking-wide text-primary">
-              A &amp; M
+              A @ M
             </span>
             <span className="block text-xs text-muted-foreground">
               مشغولات يدوية · كروشيه ومكرميه وشنط

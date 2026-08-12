@@ -18,12 +18,12 @@ import {
 export const Route = createFileRoute("/admin")({
   head: () => ({
     meta: [
-      { title: "لوحة الإدارة | متجر A & M" },
+      { title: "لوحة الإدارة | متجر A @ M" },
       {
         name: "description",
-        content: "إدارة كتالوجات متجر A & M: إضافة المنتجات وصورها وتفاصيلها وبيانات التواصل.",
+        content: "إدارة كتالوجات متجر A @ M: إضافة المنتجات وصورها وتفاصيلها وبيانات التواصل.",
       },
-      { property: "og:title", content: "لوحة الإدارة | متجر A & M" },
+      { property: "og:title", content: "لوحة الإدارة | متجر A @ M" },
       {
         property: "og:description",
         content: "إضافة وتعديل كتالوجات المنتجات وبيانات المتجر.",
