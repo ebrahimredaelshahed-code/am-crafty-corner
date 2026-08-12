@@ -1,7 +1,14 @@
+import { useEffect, useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { buildWhatsappLink, categoryLabel, type Product } from "@/lib/store";
 
 export function ProductCard({ product, whatsapp }: { product: Product; whatsapp: string }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const href = mounted
+    ? buildWhatsappLink(product, whatsapp)
+    : `https://wa.me/${whatsapp.replace(/[^\d]/g, "")}`;
+
   return (
     <article
       id={`p-${product.id}`}
@@ -29,7 +36,7 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
           <p className="font-semibold text-primary">{product.price}</p>
         ) : null}
         <a
-          href={buildWhatsappLink(product, whatsapp)}
+          href={href}
           target="_blank"
           rel="noopener noreferrer"
           className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
