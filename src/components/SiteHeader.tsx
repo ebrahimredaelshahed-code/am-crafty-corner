@@ -22,12 +22,6 @@ export function SiteHeader() {
             </span>
           </span>
         </Link>
-        <Link
-          to="/admin"
-          className="rounded-full border border-border px-4 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-accent-foreground"
-        >
-          لوحة الإدارة
-        </Link>
       </div>
     </header>
   );

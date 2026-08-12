@@ -3,8 +3,6 @@ import { useState, type FormEvent } from "react";
 import { Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
-import { SiteHeader } from "@/components/SiteHeader";
-import { SiteFooter } from "@/components/SiteFooter";
 import {
   CATEGORIES,
   DEFAULT_PRODUCTS,
