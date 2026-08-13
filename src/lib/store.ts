@@ -130,9 +130,11 @@ export function useSettings() {
 
 export function buildWhatsappLink(product: Product, whatsapp: string) {
   const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const imageUrl = product.image.startsWith("http")
-    ? product.image
-    : origin + product.image;
+  const imageUrl = product.image.startsWith("data:")
+    ? ""
+    : product.image.startsWith("http")
+      ? product.image
+      : origin + product.image;
 
   const message = [
     "السلام عليكم، أرغب في طلب المنتج التالي من متجر A @ M:",
@@ -141,7 +143,7 @@ export function buildWhatsappLink(product: Product, whatsapp: string) {
     `النوع: ${categoryLabel(product.category)}`,
     `السعر: ${product.price || "غير محدد"}`,
     `التفاصيل: ${product.details}`,
-    `صورة المنتج: ${imageUrl}`,
+    ...(imageUrl ? [`صورة المنتج: ${imageUrl}`] : []),
     `رابط الكتالوج: ${origin}/?cat=${product.category}#p-${product.id}`,
     "",
     "برجاء تأكيد التوفر وطريقة الشحن.",

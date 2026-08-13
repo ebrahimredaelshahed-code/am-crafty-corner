@@ -39,6 +39,10 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
           href={href}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={(e) => {
+            e.preventDefault();
+            window.open(href, "_blank", "noopener,noreferrer");
+          }}
           className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90"
         >
           <MessageCircle className="h-4 w-4" />
