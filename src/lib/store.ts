@@ -102,7 +102,22 @@ export function useSettings() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
-    setSettings({ ...DEFAULT_SETTINGS, ...read(SETTINGS_KEY, DEFAULT_SETTINGS) });
+    const local = { ...DEFAULT_SETTINGS, ...read(SETTINGS_KEY, DEFAULT_SETTINGS) };
+    setSettings(local);
+
+    let cancelled = false;
+    fetch("/api/public/whatsapp")
+      .then((r) => (r.ok ? r.json() : null))
+      .then((data) => {
+        if (!cancelled && data?.whatsapp) {
+          setSettings((prev) => ({ ...prev, whatsapp: data.whatsapp }));
+        }
+      })
+      .catch(() => undefined);
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const save = useCallback((next: Settings) => {
