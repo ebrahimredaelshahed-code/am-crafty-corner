@@ -150,5 +150,5 @@ export function buildWhatsappLink(product: Product, whatsapp: string) {
   ].join("\n");
 
   const number = whatsapp.replace(/[^\d]/g, "");
-  return `https://wa.me/${number}?text=${encodeURIComponent(message)}`;
+  return `whatsapp://send?phone=${number}&text=${encodeURIComponent(message)}`;
 }
