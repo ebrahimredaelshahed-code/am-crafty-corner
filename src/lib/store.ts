@@ -33,7 +33,7 @@ export type Settings = {
 };
 
 export const DEFAULT_SETTINGS: Settings = {
-  whatsapp: "+20 10 66063038",
+  whatsapp: "+201066063038",
   facebook: "https://facebook.com",
   instagram: "https://instagram.com",
   tiktok: "https://tiktok.com",
