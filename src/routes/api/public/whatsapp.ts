@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const WHATSAPP_NUMBER = "+20 10 66063038";
+const WHATSAPP_NUMBER = "+201066063038";
 
 function digits(v: string) {
   return v.replace(/[^\d]/g, "");
