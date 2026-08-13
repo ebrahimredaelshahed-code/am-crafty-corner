@@ -4,7 +4,7 @@ import { useSettings } from "@/lib/store";
 
 export function SiteFooter() {
   const { settings } = useSettings();
-  const waLink = `https://wa.me/${settings.whatsapp.replace(/[^\d]/g, "")}`;
+  const waLink = `whatsapp://send?phone=${settings.whatsapp.replace(/[^\d]/g, "")}`;
 
   return (
     <footer className="mt-20 border-t border-border bg-secondary/60">
