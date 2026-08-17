@@ -1,21 +1,15 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const WHATSAPP_NUMBER = "+201066063038";
-
-function digits(v: string) {
-  return v.replace(/[^\d]/g, "");
-}
+const WHATSAPP_LINK = "https://wa.me/qr/Q4KOXWP5DRFDA1";
 
 export const Route = createFileRoute("/api/public/whatsapp")({
   server: {
     handlers: {
       GET: async () => {
-        const number = digits(WHATSAPP_NUMBER);
         return Response.json(
           {
-            whatsapp: WHATSAPP_NUMBER,
-            number,
-            link: `https://wa.me/${number}`,
+            whatsapp: WHATSAPP_LINK,
+            link: WHATSAPP_LINK,
           },
           { headers: { "cache-control": "public, max-age=300" } },
         );

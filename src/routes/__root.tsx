@@ -79,7 +79,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "A @ M | متجر المشغولات اليدوية" },
-      { name: "description", content: "متجر A @ M للمشغولات اليدوية: كروشيه ومكرميه وشنط، والطلب عبر واتساب." },
+      {
+        name: "description",
+        content: "متجر A @ M للمشغولات اليدوية: كروشيه ومكرميه وشنط، والطلب عبر واتساب.",
+      },
       { name: "author", content: "A @ M" },
       { property: "og:title", content: "A @ M | متجر المشغولات اليدوية" },
       { property: "og:description", content: "كروشيه ومكرميه وشنط هاند ميد." },

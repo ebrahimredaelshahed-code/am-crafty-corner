@@ -12,8 +12,7 @@ export const CATEGORIES: { id: CategoryId; label: string }[] = [
   { id: "bags", label: "شنط" },
 ];
 
-export const categoryLabel = (id: string) =>
-  CATEGORIES.find((c) => c.id === id)?.label ?? id;
+export const categoryLabel = (id: string) => CATEGORIES.find((c) => c.id === id)?.label ?? id;
 
 export type Product = {
   id: string;
@@ -33,7 +32,7 @@ export type Settings = {
 };
 
 export const DEFAULT_SETTINGS: Settings = {
-  whatsapp: "+201066063038",
+  whatsapp: "https://wa.me/qr/Q4KOXWP5DRFDA1",
   facebook: "https://facebook.com",
   instagram: "https://instagram.com",
   tiktok: "https://tiktok.com",
@@ -129,6 +128,11 @@ export function useSettings() {
 }
 
 export function buildWhatsappLink(product: Product, whatsapp: string) {
+  // إذا كان الرابط يحتوي على QR أو أي رابط مباشر، استخدمه مباشرة
+  if (whatsapp.includes("/qr/") || whatsapp.includes("wa.me")) {
+    return whatsapp;
+  }
+
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const imageUrl = product.image.startsWith("data:")
     ? ""

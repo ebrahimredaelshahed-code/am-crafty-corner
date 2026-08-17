@@ -42,8 +42,8 @@ function Home() {
             أهلاً بيكِ في متجر <span className="text-primary">A @ M</span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
-            كل قطعة هنا مشغولة بالإيد بحب واهتمام… اختاري التبويب اللي يعجبك واستعرضي
-            الكتالوجات، والطلب يوصلنا مباشرة على الواتساب.
+            كل قطعة هنا مشغولة بالإيد بحب واهتمام… اختاري التبويب اللي يعجبك واستعرضي الكتالوجات،
+            والطلب يوصلنا مباشرة على الواتساب.
           </p>
         </section>
 
@@ -77,11 +77,7 @@ function Home() {
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {visible.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  whatsapp={settings.whatsapp}
-                />
+                <ProductCard key={product.id} product={product} whatsapp={settings.whatsapp} />
               ))}
             </div>
           )}
