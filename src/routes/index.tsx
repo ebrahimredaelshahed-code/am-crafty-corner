@@ -8,13 +8,14 @@ import { ProductCard } from "@/components/ProductCard";
 import {
   buildCustomOrderMessage,
   buildWhatsappMessageLink,
+  createOrderScreenshot,
   CATEGORIES,
   useProducts,
   useSettings,
   type CategoryId,
 } from "@/lib/store";
 
-const CUSTOM_DESIGN_WHATSAPP = "https://wa.me/qr/Q4KOXWP5DRFDA1";
+const CUSTOM_DESIGN_WHATSAPP = "https://wa.me/201066063038";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -140,11 +141,15 @@ function CustomDesignForm() {
 
     const message = buildCustomOrderMessage(details.trim(), notes.trim());
     try {
-      if (navigator.share && navigator.canShare?.({ files: [image] })) {
+      const screenshot = await createOrderScreenshot(image, "تصميم خاص من A @ M", [
+        `التفاصيل: ${details.trim()}`,
+        `الملاحظات: ${notes.trim() || "لا توجد ملاحظات إضافية"}`,
+      ]);
+      if (navigator.share && navigator.canShare?.({ files: [screenshot] })) {
         await navigator.share({
           title: "تصميم خاص من A @ M",
           text: message,
-          files: [image],
+          files: [screenshot],
         });
         return;
       }

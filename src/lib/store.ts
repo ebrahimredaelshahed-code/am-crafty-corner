@@ -32,7 +32,7 @@ export type Settings = {
 };
 
 export const DEFAULT_SETTINGS: Settings = {
-  whatsapp: "https://wa.me/qr/Q4KOXWP5DRFDA1",
+  whatsapp: "https://wa.me/201066063038",
   facebook: "https://facebook.com",
   instagram: "https://instagram.com",
   tiktok: "https://tiktok.com",
@@ -128,27 +128,106 @@ export function useSettings() {
 }
 
 export function buildWhatsappLink(product: Product, whatsapp: string) {
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const imageUrl = product.image.startsWith("data:")
-    ? ""
-    : product.image.startsWith("http")
-      ? product.image
-      : origin + product.image;
+  return buildWhatsappMessageLink(buildProductOrderMessage(product), whatsapp);
+}
 
-  const message = [
+export function buildProductOrderMessage(product: Product) {
+  return [
     "السلام عليكم، أرغب في طلب المنتج التالي من متجر A @ M:",
     "",
     `اسم المنتج: ${product.name}`,
     `النوع: ${categoryLabel(product.category)}`,
     `السعر: ${product.price || "غير محدد"}`,
     `التفاصيل: ${product.details}`,
-    ...(imageUrl ? [`صورة المنتج: ${imageUrl}`] : []),
-    `رابط الكتالوج: ${origin}/?cat=${product.category}#p-${product.id}`,
     "",
     "برجاء تأكيد التوفر وطريقة الشحن.",
   ].join("\n");
+}
 
-  return buildWhatsappMessageLink(message, whatsapp);
+export async function createOrderScreenshot(
+  imageSource: string | File,
+  title: string,
+  lines: string[],
+) {
+  const sourceUrl =
+    typeof imageSource === "string" ? imageSource : URL.createObjectURL(imageSource);
+  const image = new Image();
+  image.crossOrigin = "anonymous";
+  image.src = sourceUrl;
+
+  try {
+    await new Promise<void>((resolve, reject) => {
+      image.onload = () => resolve();
+      image.onerror = () => reject(new Error("تعذر تجهيز صورة الطلب"));
+    });
+
+    const canvas = document.createElement("canvas");
+    const context = canvas.getContext("2d");
+    if (!context) throw new Error("تعذر تجهيز صورة الطلب");
+
+    const width = 1200;
+    const imageHeight = 720;
+    const padding = 56;
+    const lineHeight = 48;
+    const wrappedLines = lines.flatMap((line) =>
+      wrapCanvasText(context, line, width - padding * 2),
+    );
+    canvas.width = width;
+    canvas.height = padding + 70 + imageHeight + 44 + wrappedLines.length * lineHeight + padding;
+
+    context.fillStyle = "#fffaf4";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.fillStyle = "#b6532d";
+    context.fillRect(0, 0, canvas.width, 18);
+    context.direction = "rtl";
+    context.textAlign = "right";
+    context.fillStyle = "#2b211d";
+    context.font = "bold 42px sans-serif";
+    context.fillText(title, width - padding, padding + 42);
+
+    const scale = Math.min(
+      (width - padding * 2) / image.naturalWidth,
+      imageHeight / image.naturalHeight,
+    );
+    const drawnWidth = image.naturalWidth * scale;
+    const drawnHeight = image.naturalHeight * scale;
+    const imageX = (width - drawnWidth) / 2;
+    const imageY = padding + 70 + (imageHeight - drawnHeight) / 2;
+    context.drawImage(image, imageX, imageY, drawnWidth, drawnHeight);
+
+    context.font = "28px sans-serif";
+    wrappedLines.forEach((line, index) => {
+      context.fillText(
+        line,
+        width - padding,
+        padding + 70 + imageHeight + 44 + (index + 1) * lineHeight,
+      );
+    });
+
+    const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/png"));
+    if (!blob) throw new Error("تعذر تجهيز صورة الطلب");
+    return new File([blob], "am-order.png", { type: "image/png" });
+  } finally {
+    if (typeof imageSource !== "string") URL.revokeObjectURL(sourceUrl);
+  }
+}
+
+function wrapCanvasText(context: CanvasRenderingContext2D, text: string, maxWidth: number) {
+  if (!text) return [""];
+  const words = text.split(" ");
+  const lines: string[] = [];
+  let current = "";
+  words.forEach((word) => {
+    const candidate = current ? `${current} ${word}` : word;
+    if (context.measureText(candidate).width > maxWidth && current) {
+      lines.push(current);
+      current = word;
+    } else {
+      current = candidate;
+    }
+  });
+  if (current) lines.push(current);
+  return lines;
 }
 
 export function buildWhatsappMessageLink(message: string, whatsapp: string) {

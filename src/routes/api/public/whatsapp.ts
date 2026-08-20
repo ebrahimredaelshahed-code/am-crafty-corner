@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 
-const WHATSAPP_LINK = "https://wa.me/qr/Q4KOXWP5DRFDA1";
+const WHATSAPP_LINK = "https://wa.me/201066063038";
 
 export const Route = createFileRoute("/api/public/whatsapp")({
   server: {

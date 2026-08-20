@@ -1,14 +1,35 @@
 import { MessageCircle } from "lucide-react";
-import { buildWhatsappLink, categoryLabel, type Product } from "@/lib/store";
+import {
+  buildProductOrderMessage,
+  buildWhatsappLink,
+  categoryLabel,
+  createOrderScreenshot,
+  type Product,
+} from "@/lib/store";
 
 export function ProductCard({ product, whatsapp }: { product: Product; whatsapp: string }) {
   const href = buildWhatsappLink(product, whatsapp);
 
-  const handleWhatsAppClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+  const handleWhatsAppClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-    // Try to open WhatsApp directly
+    const message = buildProductOrderMessage(product);
+
+    try {
+      const screenshot = await createOrderScreenshot(product.image, product.name, [
+        `النوع: ${categoryLabel(product.category)}`,
+        `السعر: ${product.price || "غير محدد"}`,
+        `التفاصيل: ${product.details}`,
+      ]);
+      if (navigator.share && navigator.canShare?.({ files: [screenshot] })) {
+        await navigator.share({ title: product.name, text: message, files: [screenshot] });
+        return;
+      }
+    } catch (error) {
+      if ((error as DOMException).name === "AbortError") return;
+    }
+
     if (href) {
-      window.open(href, "_blank", "noopener,noreferrer");
+      window.location.assign(href);
     }
   };
 
