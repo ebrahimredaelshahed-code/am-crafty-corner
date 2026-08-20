@@ -10,7 +10,7 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-[1.1fr_0.9fr] md:gap-16">
         <div className="text-center md:text-right">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary/75">
-            مشغولات يدوية بحب
+            نهتم بأدق التفاصيل
           </p>
           <h2 className="mt-2 font-display text-3xl font-bold text-primary">A @ M</h2>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-8 text-muted-foreground md:mx-0">
