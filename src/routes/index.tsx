@@ -7,11 +7,14 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { ProductCard } from "@/components/ProductCard";
 import {
   buildCustomOrderMessage,
+  buildWhatsappMessageLink,
   CATEGORIES,
   useProducts,
   useSettings,
   type CategoryId,
 } from "@/lib/store";
+
+const CUSTOM_DESIGN_WHATSAPP = "https://wa.me/qr/Q4KOXWP5DRFDA1";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -137,22 +140,21 @@ function CustomDesignForm() {
 
     const message = buildCustomOrderMessage(details.trim(), notes.trim());
     try {
-      setStatus("جارٍ إرسال التصميم عبر واتساب...");
-      const formData = new FormData();
-      formData.append("image", image);
-      formData.append("message", message);
-
-      const response = await fetch("/api/public/whatsapp", {
-        method: "POST",
-        body: formData,
-      });
-      const result = (await response.json()) as { message?: string };
-      if (!response.ok) throw new Error(result.message || "تعذر إرسال التصميم.");
-
-      setStatus("تم إرسال التصميم والتفاصيل إلى واتساب بنجاح.");
+      if (navigator.share && navigator.canShare?.({ files: [image] })) {
+        await navigator.share({ title: "تصميم خاص من A @ M", text: message, files: [image] });
+        setStatus("تم تجهيز المشاركة عبر واتساب.");
+        return;
+      }
     } catch (error) {
-      setStatus(error instanceof Error ? error.message : "تعذر إرسال التصميم.");
+      if ((error as DOMException).name === "AbortError") return;
     }
+
+    window.open(
+      buildWhatsappMessageLink(message, CUSTOM_DESIGN_WHATSAPP),
+      "_blank",
+      "noopener,noreferrer",
+    );
+    setStatus("تم فتح واتساب. أرفقي الصورة من جهازك قبل الإرسال.");
   };
 
   return (
