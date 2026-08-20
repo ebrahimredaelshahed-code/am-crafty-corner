@@ -19,16 +19,16 @@ const CUSTOM_DESIGN_WHATSAPP = "https://wa.me/201066063038";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "A @ M | متجر المشغولات اليدوية — كروشيه ومكرميه وشنط" },
+      { title: "A @ M | Crochet & Macrame" },
       {
         name: "description",
         content:
-          "متجر A @ M للمشغولات اليدوية: كتالوجات كروشيه ومكرميه وشنط بتصميمات مميزة، اطلب منتجك مباشرة عبر واتساب.",
+          "متجر A @ M للمشغولات اليدوية:  كروشيه ومكرميه بتصميمات مميزة، اطلب منتجك مباشرة عبر موقعنا وتواصل عبر واتساب.",
       },
-      { property: "og:title", content: "A @ M | متجر المشغولات اليدوية" },
+      { property: "og:title", content: "A @ M | Crochet & Macrame" },
       {
         property: "og:description",
-        content: "كروشيه ومكرميه وشنط هاند ميد، والطلب مباشرة عبر واتساب.",
+        content: "كروشيه ومكرميه هاند ميد، .",
       },
     ],
   }),
@@ -183,7 +183,7 @@ function CustomDesignForm() {
           <textarea
             value={details}
             onChange={(event) => setDetails(event.target.value)}
-            placeholder="اكتبي نوع القطعة، المقاس، الألوان والخامة..."
+            placeholder=" نوع القطعة، المقاس، الألوان والخامة..."
             className="min-h-32 w-full rounded-xl border border-input bg-background px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-ring"
           />
         </label>
@@ -192,7 +192,7 @@ function CustomDesignForm() {
           <textarea
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
-            placeholder="أي ملاحظات أو موعد استلام مفضل"
+            placeholder="أي ملاحظات او تفاصيل اضافيه    "
             className="min-h-24 w-full rounded-xl border border-input bg-background px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-ring"
           />
         </label>

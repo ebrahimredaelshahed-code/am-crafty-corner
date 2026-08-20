@@ -9,7 +9,6 @@ export type CategoryId = "crochet" | "macrame" | "bags";
 export const CATEGORIES: { id: CategoryId; label: string }[] = [
   { id: "crochet", label: "كروشيه" },
   { id: "macrame", label: "مكرميه" },
-  { id: "bags", label: "شنط" },
 ];
 
 export const categoryLabel = (id: string) => CATEGORIES.find((c) => c.id === id)?.label ?? id;
