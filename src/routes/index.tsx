@@ -8,7 +8,6 @@ import { ProductCard } from "@/components/ProductCard";
 import {
   buildCustomOrderMessage,
   buildWhatsappMessageLink,
-  createOrderScreenshot,
   CATEGORIES,
   useProducts,
   useSettings,
@@ -133,32 +132,14 @@ function CustomDesignForm() {
     return () => URL.revokeObjectURL(url);
   }, [image]);
 
-  const sendOrder = async () => {
+  const sendOrder = () => {
     if (!image || !details.trim()) {
       setStatus("أرفقي صورة واكتبي تفاصيل التصميم أولًا.");
       return;
     }
 
     const message = buildCustomOrderMessage(details.trim(), notes.trim());
-    try {
-      const screenshot = await createOrderScreenshot(image, "تصميم خاص من A @ M", [
-        `التفاصيل: ${details.trim()}`,
-        `الملاحظات: ${notes.trim() || "لا توجد ملاحظات إضافية"}`,
-      ]);
-      if (navigator.share && navigator.canShare?.({ files: [screenshot] })) {
-        await navigator.share({
-          title: "تصميم خاص من A @ M",
-          text: message,
-          files: [screenshot],
-        });
-        return;
-      }
-    } catch (error) {
-      if ((error as DOMException).name === "AbortError") return;
-    }
-
     window.location.assign(buildWhatsappMessageLink(message, CUSTOM_DESIGN_WHATSAPP));
-    setStatus("تم فتح واتساب. أرفقي الصورة من جهازك قبل الإرسال.");
   };
 
   return (

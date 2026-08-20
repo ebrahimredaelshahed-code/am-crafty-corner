@@ -244,6 +244,6 @@ export function buildCustomOrderMessage(details: string, notes: string) {
     `التفاصيل المطلوبة: ${details}`,
     `الملاحظات: ${notes || "لا توجد ملاحظات إضافية"}`,
     "",
-    "الصورة مرفقة مع الرسالة.",
+    "سأرسل صورة التصميم بشكل منفصل.",
   ].join("\n");
 }
