@@ -13,6 +13,9 @@ import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 
+const siteUrl = import.meta.env.VITE_SITE_URL?.replace(/\/$/, "");
+const socialImage = siteUrl ? `${siteUrl}/favicon.png` : "/favicon.png";
+
 function NotFoundComponent() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4">
@@ -87,9 +90,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { property: "og:title", content: "A @ M | متجر المشغولات اليدوية" },
       { property: "og:description", content: "كروشيه ومكرميه هاند ميد." },
       { property: "og:type", content: "website" },
-      { property: "og:image", content: "/favicon.png" },
+      { property: "og:image", content: socialImage },
+      { property: "og:image:secure_url", content: socialImage },
+      { property: "og:image:type", content: "image/png" },
+      { property: "og:image:width", content: "800" },
+      { property: "og:image:height", content: "689" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:image", content: "/favicon.png" },
+      { name: "twitter:image", content: socialImage },
       { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
