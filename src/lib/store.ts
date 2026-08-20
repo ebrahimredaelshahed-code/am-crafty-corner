@@ -128,11 +128,6 @@ export function useSettings() {
 }
 
 export function buildWhatsappLink(product: Product, whatsapp: string) {
-  // إذا كان الرابط يحتوي على QR أو أي رابط مباشر، استخدمه مباشرة
-  if (whatsapp.includes("/qr/") || whatsapp.includes("wa.me")) {
-    return whatsapp;
-  }
-
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const imageUrl = product.image.startsWith("data:")
     ? ""
@@ -153,6 +148,23 @@ export function buildWhatsappLink(product: Product, whatsapp: string) {
     "برجاء تأكيد التوفر وطريقة الشحن.",
   ].join("\n");
 
+  return buildWhatsappMessageLink(message, whatsapp);
+}
+
+export function buildWhatsappMessageLink(message: string, whatsapp: string) {
   const number = whatsapp.replace(/[^\d]/g, "");
-  return `whatsapp://send?phone=${number}&text=${encodeURIComponent(message)}`;
+  const base = whatsapp.includes("/qr/") ? whatsapp : number ? `https://wa.me/${number}` : whatsapp;
+
+  return `${base}${base.includes("?") ? "&" : "?"}text=${encodeURIComponent(message)}`;
+}
+
+export function buildCustomOrderMessage(details: string, notes: string) {
+  return [
+    "السلام عليكم، أريد تنفيذ تصميم خاص من متجر A @ M:",
+    "",
+    `التفاصيل المطلوبة: ${details}`,
+    `الملاحظات: ${notes || "لا توجد ملاحظات إضافية"}`,
+    "",
+    "الصورة مرفقة مع الرسالة.",
+  ].join("\n");
 }

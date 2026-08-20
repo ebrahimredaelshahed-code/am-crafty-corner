@@ -1,10 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
+import { ImagePlus, Send, Sparkles } from "lucide-react";
+import { useEffect, useState } from "react";
 
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
 import { ProductCard } from "@/components/ProductCard";
-import { CATEGORIES, useProducts, useSettings, type CategoryId } from "@/lib/store";
+import {
+  buildCustomOrderMessage,
+  buildWhatsappMessageLink,
+  CATEGORIES,
+  useProducts,
+  useSettings,
+  type CategoryId,
+} from "@/lib/store";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -28,7 +36,7 @@ export const Route = createFileRoute("/")({
 function Home() {
   const { products } = useProducts();
   const { settings } = useSettings();
-  const [active, setActive] = useState<CategoryId>("crochet");
+  const [active, setActive] = useState<CategoryId | "custom">("crochet");
 
   const visible = products.filter((p) => p.category === active);
 
@@ -67,10 +75,26 @@ function Home() {
               {cat.label}
             </button>
           ))}
+          <button
+            type="button"
+            onClick={() => setActive("custom")}
+            aria-pressed={active === "custom"}
+            className={
+              "inline-flex items-center gap-2 rounded-full px-6 py-2.5 text-sm font-semibold transition-colors " +
+              (active === "custom"
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:bg-background")
+            }
+          >
+            <Sparkles className="h-4 w-4" />
+            تصميمك الخاص
+          </button>
         </nav>
 
         <section className="mt-10">
-          {visible.length === 0 ? (
+          {active === "custom" ? (
+            <CustomDesignForm whatsapp={settings.whatsapp} />
+          ) : visible.length === 0 ? (
             <p className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
               لا توجد منتجات في هذا التبويب حاليًا، تابعينا قريبًا.
             </p>
@@ -85,6 +109,108 @@ function Home() {
       </main>
 
       <SiteFooter />
+    </div>
+  );
+}
+
+function CustomDesignForm({ whatsapp }: { whatsapp: string }) {
+  const [image, setImage] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
+  const [details, setDetails] = useState("");
+  const [notes, setNotes] = useState("");
+  const [status, setStatus] = useState("");
+
+  useEffect(() => {
+    if (!image) {
+      setPreview(null);
+      return;
+    }
+    const url = URL.createObjectURL(image);
+    setPreview(url);
+    return () => URL.revokeObjectURL(url);
+  }, [image]);
+
+  const sendOrder = async () => {
+    if (!image || !details.trim()) {
+      setStatus("أرفقي صورة واكتبي تفاصيل التصميم أولًا.");
+      return;
+    }
+
+    const message = buildCustomOrderMessage(details.trim(), notes.trim());
+    try {
+      if (navigator.share && navigator.canShare?.({ files: [image] })) {
+        await navigator.share({ title: "تصميم خاص من A @ M", text: message, files: [image] });
+        setStatus("تم تجهيز المشاركة عبر واتساب.");
+        return;
+      }
+    } catch (error) {
+      if ((error as DOMException).name === "AbortError") return;
+    }
+
+    window.open(buildWhatsappMessageLink(message, whatsapp), "_blank", "noopener,noreferrer");
+    setStatus("تم فتح واتساب. أرفقي الصورة من جهازك قبل الإرسال.");
+  };
+
+  return (
+    <div className="mx-auto grid max-w-4xl gap-8 rounded-3xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] md:grid-cols-[0.9fr_1.1fr] md:p-8">
+      <div className="flex min-h-72 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary/40 bg-secondary/40 p-5 text-center">
+        {preview ? (
+          <img
+            src={preview}
+            alt="معاينة التصميم"
+            className="h-64 w-full rounded-xl object-contain"
+          />
+        ) : (
+          <ImagePlus className="mb-4 h-12 w-12 text-primary" />
+        )}
+        <label className="mt-4 cursor-pointer rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90">
+          {image ? "تغيير الصورة" : "أرفقي صورة التصميم"}
+          <input
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            onChange={(event) => setImage(event.target.files?.[0] ?? null)}
+          />
+        </label>
+        <p className="mt-3 text-xs text-muted-foreground">صورة واحدة بصيغة JPG أو PNG</p>
+      </div>
+      <div className="space-y-5">
+        <div>
+          <h2 className="font-display text-2xl font-bold text-card-foreground">
+            صممي قطعتك على ذوقك
+          </h2>
+          <p className="mt-2 text-sm leading-7 text-muted-foreground">
+            ابعتي فكرتك، وسنرجع لكِ بالتفاصيل والتكلفة المناسبة.
+          </p>
+        </div>
+        <label className="block space-y-2 text-sm font-semibold text-card-foreground">
+          تفاصيل التصميم <span className="text-primary">*</span>
+          <textarea
+            value={details}
+            onChange={(event) => setDetails(event.target.value)}
+            placeholder="اكتبي نوع القطعة، المقاس، الألوان والخامة..."
+            className="min-h-32 w-full rounded-xl border border-input bg-background px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-ring"
+          />
+        </label>
+        <label className="block space-y-2 text-sm font-semibold text-card-foreground">
+          ملاحظات إضافية
+          <textarea
+            value={notes}
+            onChange={(event) => setNotes(event.target.value)}
+            placeholder="أي ملاحظات أو موعد استلام مفضل"
+            className="min-h-24 w-full rounded-xl border border-input bg-background px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-ring"
+          />
+        </label>
+        <button
+          type="button"
+          onClick={sendOrder}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground hover:opacity-90"
+        >
+          <Send className="h-4 w-4" />
+          إرسال التصميم عبر واتساب
+        </button>
+        {status ? <p className="text-center text-sm text-muted-foreground">{status}</p> : null}
+      </div>
     </div>
   );
 }

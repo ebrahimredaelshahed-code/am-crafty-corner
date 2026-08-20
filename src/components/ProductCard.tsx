@@ -1,13 +1,8 @@
-import { useEffect, useState } from "react";
 import { MessageCircle } from "lucide-react";
 import { buildWhatsappLink, categoryLabel, type Product } from "@/lib/store";
 
 export function ProductCard({ product, whatsapp }: { product: Product; whatsapp: string }) {
-  const [mounted, setMounted] = useState(false);
-  useEffect(() => setMounted(true), []);
-  const href = mounted
-    ? buildWhatsappLink(product, whatsapp)
-    : `https://wa.me/${whatsapp.replace(/[^\d]/g, "")}`;
+  const href = buildWhatsappLink(product, whatsapp);
 
   const handleWhatsAppClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
