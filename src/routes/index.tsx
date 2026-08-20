@@ -7,7 +7,6 @@ import { SiteFooter } from "@/components/SiteFooter";
 import { ProductCard } from "@/components/ProductCard";
 import {
   buildCustomOrderMessage,
-  buildWhatsappMessageLink,
   CATEGORIES,
   useProducts,
   useSettings,
@@ -93,7 +92,7 @@ function Home() {
 
         <section className="mt-10">
           {active === "custom" ? (
-            <CustomDesignForm whatsapp={settings.whatsapp} />
+            <CustomDesignForm />
           ) : visible.length === 0 ? (
             <p className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
               لا توجد منتجات في هذا التبويب حاليًا، تابعينا قريبًا.
@@ -113,7 +112,7 @@ function Home() {
   );
 }
 
-function CustomDesignForm({ whatsapp }: { whatsapp: string }) {
+function CustomDesignForm() {
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string | null>(null);
   const [details, setDetails] = useState("");
@@ -138,17 +137,22 @@ function CustomDesignForm({ whatsapp }: { whatsapp: string }) {
 
     const message = buildCustomOrderMessage(details.trim(), notes.trim());
     try {
-      if (navigator.share && navigator.canShare?.({ files: [image] })) {
-        await navigator.share({ title: "تصميم خاص من A @ M", text: message, files: [image] });
-        setStatus("تم تجهيز المشاركة عبر واتساب.");
-        return;
-      }
-    } catch (error) {
-      if ((error as DOMException).name === "AbortError") return;
-    }
+      setStatus("جارٍ إرسال التصميم عبر واتساب...");
+      const formData = new FormData();
+      formData.append("image", image);
+      formData.append("message", message);
 
-    window.open(buildWhatsappMessageLink(message, whatsapp), "_blank", "noopener,noreferrer");
-    setStatus("تم فتح واتساب. أرفقي الصورة من جهازك قبل الإرسال.");
+      const response = await fetch("/api/public/whatsapp", {
+        method: "POST",
+        body: formData,
+      });
+      const result = (await response.json()) as { message?: string };
+      if (!response.ok) throw new Error(result.message || "تعذر إرسال التصميم.");
+
+      setStatus("تم إرسال التصميم والتفاصيل إلى واتساب بنجاح.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "تعذر إرسال التصميم.");
+    }
   };
 
   return (
