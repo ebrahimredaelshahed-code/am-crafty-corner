@@ -9,6 +9,7 @@ export type CategoryId = "crochet" | "macrame" | "bags";
 export const CATEGORIES: { id: CategoryId; label: string }[] = [
   { id: "crochet", label: "كروشيه" },
   { id: "macrame", label: "مكرميه" },
+  { id: "bags", label: "شنط" },
 ];
 
 export const categoryLabel = (id: string) => CATEGORIES.find((c) => c.id === id)?.label ?? id;
@@ -36,7 +37,7 @@ export const DEFAULT_SETTINGS: Settings = {
   instagram: "https://instagram.com",
   tiktok: "https://tiktok.com",
   about:
-    "A @ M متجر متخصص في المشغولات اليدوية من الكروشيه والمكرميه، كل قطعة تُصنع يدويًا بخامات مختارة بعناية وبلمسة خاصة تناسب ذوقك.",
+    "A @ M متجر متخصص في المشغولات اليدوية من الكروشيه والمكرميه والشنط، كل قطعة تُصنع يدويًا بخامات مختارة بعناية وبلمسة خاصة تناسب ذوقك.",
 };
 
 export const DEFAULT_PRODUCTS: Product[] = [
@@ -142,8 +143,6 @@ export function buildProductOrderMessage(product: Product) {
     `السعر: ${product.price || "غير محدد"}`,
     `التفاصيل: ${product.details}`,
     `رابط الكتالوج: ${productLink}`,
-    "",
-    "برجاء تأكيد التوفر وطريقة الشحن.",
   ].join("\n");
 }
 

@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import logo from "@/assets/logo.png.png";
 
 export function SiteHeader() {
   return (
@@ -7,7 +6,7 @@ export function SiteHeader() {
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
         <Link to="/" className="flex items-center gap-3">
           <img
-            src={logo}
+            src="/logo.png.png"
             alt="شعار متجر A @ M للمشغولات اليدوية"
             width={56}
             height={56}
