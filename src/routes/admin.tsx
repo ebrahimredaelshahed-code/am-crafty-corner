@@ -56,7 +56,7 @@ function Admin() {
     reader.readAsDataURL(file);
   };
 
-  const addProduct = (e: FormEvent) => {
+  const addProduct = async (e: FormEvent) => {
     e.preventDefault();
     if (!form.name.trim() || !form.details.trim() || !form.image) {
       toast.error("من فضلك أكملي اسم المنتج والتفاصيل والصورة");
@@ -70,14 +70,22 @@ function Admin() {
       price: form.price.trim().slice(0, 40),
       image: form.image,
     };
-    save([product, ...products]);
-    setForm(emptyForm);
-    toast.success("تمت إضافة المنتج للكتالوج");
+    try {
+      await save([product, ...products]);
+      setForm(emptyForm);
+      toast.success("تمت إضافة المنتج للكتالوج");
+    } catch {
+      toast.error("تعذر حفظ المنتج على الخادم، تأكدي من إعداد قاعدة البيانات في Vercel");
+    }
   };
 
-  const remove = (id: string) => {
-    save(products.filter((p) => p.id !== id));
-    toast.success("تم حذف المنتج");
+  const remove = async (id: string) => {
+    try {
+      await save(products.filter((p) => p.id !== id));
+      toast.success("تم حذف المنتج");
+    } catch {
+      toast.error("تعذر حذف المنتج على الخادم، تأكدي من إعداد قاعدة البيانات في Vercel");
+    }
   };
 
   return (
@@ -195,9 +203,13 @@ function Admin() {
               </Field>
               <button
                 type="button"
-                onClick={() => {
-                  saveSettings(contact);
-                  toast.success("تم حفظ بيانات المتجر");
+                onClick={async () => {
+                  try {
+                    await saveSettings(contact);
+                    toast.success("تم حفظ بيانات المتجر");
+                  } catch {
+                    toast.error("تعذر حفظ البيانات، تأكدي من إعداد قاعدة البيانات في Vercel");
+                  }
                 }}
                 className="mt-4 rounded-xl border border-border px-5 py-2.5 text-sm font-semibold transition-colors hover:bg-accent"
               >
@@ -212,9 +224,13 @@ function Admin() {
                 </h2>
                 <button
                   type="button"
-                  onClick={() => {
-                    save(DEFAULT_PRODUCTS);
-                    toast.success("تمت الاستعادة للمنتجات الافتراضية");
+                  onClick={async () => {
+                    try {
+                      await save(DEFAULT_PRODUCTS);
+                      toast.success("تمت الاستعادة للمنتجات الافتراضية");
+                    } catch {
+                      toast.error("تعذر الاستعادة، تأكدي من إعداد قاعدة البيانات في Vercel");
+                    }
                   }}
                   className="text-xs text-muted-foreground underline"
                 >

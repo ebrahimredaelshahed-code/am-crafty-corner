@@ -95,13 +95,14 @@ export function useProducts() {
   }, []);
 
   const save = useCallback(async (next: Product[]) => {
-    setProducts(next);
-    window.localStorage.setItem(PRODUCTS_KEY, JSON.stringify(next));
-    await fetch("/api/store", {
+    const response = await fetch("/api/store", {
       method: "PUT",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ products: next }),
     });
+    if (!response.ok) throw new Error("تعذر حفظ المنتجات على الخادم");
+    setProducts(next);
+    window.localStorage.setItem(PRODUCTS_KEY, JSON.stringify(next));
   }, []);
 
   return { products, save, ready };
@@ -120,13 +121,14 @@ export function useSettings() {
   }, []);
 
   const save = useCallback(async (next: Settings) => {
-    setSettings(next);
-    window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
-    await fetch("/api/store", {
+    const response = await fetch("/api/store", {
       method: "PUT",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ settings: next }),
     });
+    if (!response.ok) throw new Error("تعذر حفظ بيانات المتجر على الخادم");
+    setSettings(next);
+    window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
   }, []);
 
   return { settings, save };

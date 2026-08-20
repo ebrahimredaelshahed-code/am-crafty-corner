@@ -1,45 +1,33 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { neon } from "@neondatabase/serverless";
 
 import { DEFAULT_PRODUCTS, DEFAULT_SETTINGS, type Product, type Settings } from "@/lib/store";
 
-type D1Result = { results?: Record<string, unknown>[] };
-type D1Database = {
-  prepare: (query: string) => {
-    bind: (...values: unknown[]) => {
-      all: <T = D1Result>() => Promise<T>;
-      run: () => Promise<unknown>;
-    };
-    all: <T = D1Result>() => Promise<T>;
-    run: () => Promise<unknown>;
-  };
-};
+type StoreRow = { key: string; value: Product[] | Settings };
 
-async function getDatabase() {
-  try {
-    const cloudflare = await import("cloudflare:workers");
-    return (cloudflare.env as { DB?: D1Database }).DB;
-  } catch {
-    return undefined;
-  }
+function getDatabaseUrl() {
+  return process.env.DATABASE_URL;
 }
 
-async function ensureDatabase(db: D1Database) {
-  await db
-    .prepare(
-      "CREATE TABLE IF NOT EXISTS store_data (key TEXT PRIMARY KEY NOT NULL, value TEXT NOT NULL)",
+async function ensureDatabase(sql: ReturnType<typeof neon>) {
+  await sql`
+    CREATE TABLE IF NOT EXISTS store_data (
+      key TEXT PRIMARY KEY NOT NULL,
+      value JSONB NOT NULL
     )
-    .run();
+  `;
 }
 
-async function readStore(db: D1Database) {
-  await ensureDatabase(db);
-  const result = await db.prepare("SELECT key, value FROM store_data").all<D1Result>();
-  const data = Object.fromEntries(
-    (result.results ?? []).map((row) => [row.key, JSON.parse(String(row.value))]),
-  ) as { products?: Product[]; settings?: Settings };
+async function readStore(sql: ReturnType<typeof neon>) {
+  await ensureDatabase(sql);
+  const rows = (await sql`SELECT key, value FROM store_data`) as StoreRow[];
+  const data = Object.fromEntries(rows.map((row) => [row.key, row.value])) as {
+    products?: Product[];
+    settings?: Settings;
+  };
 
-  if (!data.products) await writeValue(db, "products", DEFAULT_PRODUCTS);
-  if (!data.settings) await writeValue(db, "settings", DEFAULT_SETTINGS);
+  if (!data.products) await writeValue(sql, "products", DEFAULT_PRODUCTS);
+  if (!data.settings) await writeValue(sql, "settings", DEFAULT_SETTINGS);
 
   return {
     products: data.products ?? DEFAULT_PRODUCTS,
@@ -47,13 +35,12 @@ async function readStore(db: D1Database) {
   };
 }
 
-async function writeValue(db: D1Database, key: string, value: unknown) {
-  await db
-    .prepare(
-      "INSERT INTO store_data (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value",
-    )
-    .bind(key, JSON.stringify(value))
-    .run();
+async function writeValue(sql: ReturnType<typeof neon>, key: string, value: unknown) {
+  await sql`
+    INSERT INTO store_data (key, value)
+    VALUES (${key}, ${JSON.stringify(value)}::jsonb)
+    ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
+  `;
 }
 
 async function parseJson(request: Request) {
@@ -68,22 +55,24 @@ export const Route = createFileRoute("/api/store")({
   server: {
     handlers: {
       GET: async () => {
-        const db = await getDatabase();
-        if (!db) return Response.json({ error: "Database is not configured" }, { status: 503 });
-        return Response.json(await readStore(db), {
+        const databaseUrl = getDatabaseUrl();
+        if (!databaseUrl) return Response.json({ error: "Database is not configured" }, { status: 503 });
+        const sql = neon(databaseUrl);
+        return Response.json(await readStore(sql), {
           headers: { "cache-control": "no-store" },
         });
       },
       PUT: async ({ request }) => {
-        const db = await getDatabase();
-        if (!db) return Response.json({ error: "Database is not configured" }, { status: 503 });
+        const databaseUrl = getDatabaseUrl();
+        if (!databaseUrl) return Response.json({ error: "Database is not configured" }, { status: 503 });
+        const sql = neon(databaseUrl);
         const body = (await parseJson(request)) as { products?: Product[]; settings?: Settings } | null;
         if (!body || (!body.products && !body.settings)) {
           return Response.json({ error: "Invalid store payload" }, { status: 400 });
         }
-        await ensureDatabase(db);
-        if (body.products) await writeValue(db, "products", body.products);
-        if (body.settings) await writeValue(db, "settings", body.settings);
+        await ensureDatabase(sql);
+        if (body.products) await writeValue(sql, "products", body.products);
+        if (body.settings) await writeValue(sql, "settings", body.settings);
         return Response.json({ ok: true });
       },
     },
