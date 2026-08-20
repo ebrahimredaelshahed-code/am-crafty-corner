@@ -37,7 +37,6 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
         </span>
         <h3 className="font-display text-lg font-semibold text-card-foreground">{product.name}</h3>
         <p className="text-sm leading-7 text-muted-foreground">{product.details}</p>
-        {product.price ? <p className="font-semibold text-primary">{product.price}</p> : null}
         <button
           onClick={handleWhatsAppClick}
           className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 cursor-pointer border-0"

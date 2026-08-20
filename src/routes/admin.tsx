@@ -128,15 +128,6 @@ function Admin() {
               />
             </Field>
 
-            <Field label="السعر (اختياري)">
-              <input
-                className={inputCls}
-                maxLength={40}
-                value={form.price}
-                onChange={(e) => setForm({ ...form, price: e.target.value })}
-              />
-            </Field>
-
             <Field label="صورة المنتج">
               <input
                 type="file"

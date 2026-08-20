@@ -1,5 +1,4 @@
 import { Facebook, Instagram, MessageCircle, Music2 } from "lucide-react";
-import logo from "@/assets/logo.png.png";
 import { useSettings } from "@/lib/store";
 
 export function SiteFooter() {
@@ -10,14 +9,6 @@ export function SiteFooter() {
     <footer className="mt-20 border-t border-border bg-secondary/60">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-2">
         <div>
-          <img
-            src={logo}
-            alt="شعار A @ M"
-            loading="lazy"
-            width={72}
-            height={72}
-            className="h-18 w-18 object-contain"
-          />
           <h2 className="mt-3 font-display text-xl font-bold text-primary">A @ M</h2>
           <p className="mt-2 text-sm leading-7 text-muted-foreground">{settings.about}</p>
         </div>
