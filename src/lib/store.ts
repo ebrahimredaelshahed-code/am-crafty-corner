@@ -85,13 +85,23 @@ export function useProducts() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    setProducts(read(PRODUCTS_KEY, DEFAULT_PRODUCTS));
-    setReady(true);
+    fetch("/api/store")
+      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then((data: { products?: Product[] }) => {
+        setProducts(data.products ?? DEFAULT_PRODUCTS);
+      })
+      .catch(() => setProducts(read(PRODUCTS_KEY, DEFAULT_PRODUCTS)))
+      .finally(() => setReady(true));
   }, []);
 
-  const save = useCallback((next: Product[]) => {
+  const save = useCallback(async (next: Product[]) => {
     setProducts(next);
     window.localStorage.setItem(PRODUCTS_KEY, JSON.stringify(next));
+    await fetch("/api/store", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ products: next }),
+    });
   }, []);
 
   return { products, save, ready };
@@ -101,27 +111,22 @@ export function useSettings() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
 
   useEffect(() => {
-    const local = { ...DEFAULT_SETTINGS, ...read(SETTINGS_KEY, DEFAULT_SETTINGS) };
-    setSettings(local);
-
-    let cancelled = false;
-    fetch("/api/public/whatsapp")
-      .then((r) => (r.ok ? r.json() : null))
-      .then((data) => {
-        if (!cancelled && data?.whatsapp) {
-          setSettings((prev) => ({ ...prev, whatsapp: data.whatsapp }));
-        }
+    fetch("/api/store")
+      .then((response) => (response.ok ? response.json() : Promise.reject()))
+      .then((data: { settings?: Settings }) => {
+        setSettings({ ...DEFAULT_SETTINGS, ...data.settings });
       })
-      .catch(() => undefined);
-
-    return () => {
-      cancelled = true;
-    };
+      .catch(() => setSettings({ ...DEFAULT_SETTINGS, ...read(SETTINGS_KEY, DEFAULT_SETTINGS) }));
   }, []);
 
-  const save = useCallback((next: Settings) => {
+  const save = useCallback(async (next: Settings) => {
     setSettings(next);
     window.localStorage.setItem(SETTINGS_KEY, JSON.stringify(next));
+    await fetch("/api/store", {
+      method: "PUT",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ settings: next }),
+    });
   }, []);
 
   return { settings, save };
