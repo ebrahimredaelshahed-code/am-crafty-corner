@@ -38,7 +38,11 @@ export const Route = createFileRoute("/")({
 function Home() {
   const { products } = useProducts();
   const { settings } = useSettings();
-  const [active, setActive] = useState<CategoryId | "custom">("crochet");
+  const [active, setActive] = useState<CategoryId | "custom">(() => {
+    if (typeof window === "undefined") return "crochet";
+    const category = new URLSearchParams(window.location.search).get("cat");
+    return CATEGORIES.some((item) => item.id === category) ? (category as CategoryId) : "crochet";
+  });
 
   const visible = products.filter((p) => p.category === active);
 

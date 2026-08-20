@@ -132,6 +132,9 @@ export function buildWhatsappLink(product: Product, whatsapp: string) {
 }
 
 export function buildProductOrderMessage(product: Product) {
+  const origin = typeof window !== "undefined" ? window.location.origin : "";
+  const productLink = `${origin}/?cat=${product.category}#p-${product.id}`;
+
   return [
     "السلام عليكم، أرغب في طلب المنتج التالي من متجر A @ M:",
     "",
@@ -139,6 +142,7 @@ export function buildProductOrderMessage(product: Product) {
     `النوع: ${categoryLabel(product.category)}`,
     `السعر: ${product.price || "غير محدد"}`,
     `التفاصيل: ${product.details}`,
+    `رابط الكتالوج: ${productLink}`,
     "",
     "برجاء تأكيد التوفر وطريقة الشحن.",
   ].join("\n");
