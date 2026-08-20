@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.png.png";
 
 export function SiteHeader() {
   return (
@@ -18,7 +18,7 @@ export function SiteHeader() {
               A @ M
             </span>
             <span className="block text-xs text-muted-foreground">
-              مشغولات يدوية · كروشيه ومكرميه وشنط
+              مشغولات يدوية · كروشيه ومكرميه
             </span>
           </span>
         </Link>

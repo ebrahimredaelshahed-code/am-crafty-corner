@@ -1,5 +1,5 @@
 import { Facebook, Instagram, MessageCircle, Music2 } from "lucide-react";
-import logo from "@/assets/logo.png";
+import logo from "@/assets/logo.png.png";
 import { useSettings } from "@/lib/store";
 
 export function SiteFooter() {
@@ -8,7 +8,7 @@ export function SiteFooter() {
 
   return (
     <footer className="mt-20 border-t border-border bg-secondary/60">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-3">
+      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-12 md:grid-cols-2">
         <div>
           <img
             src={logo}
@@ -20,16 +20,6 @@ export function SiteFooter() {
           />
           <h2 className="mt-3 font-display text-xl font-bold text-primary">A @ M</h2>
           <p className="mt-2 text-sm leading-7 text-muted-foreground">{settings.about}</p>
-        </div>
-
-        <div>
-          <h3 className="font-display text-lg font-semibold">بيانات المتجر</h3>
-          <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
-            <li>واتساب: {settings.whatsapp}</li>
-            <li>ساعات العمل: يوميًا من 10 صباحًا حتى 10 مساءً</li>
-            <li>الشحن متاح لجميع المحافظات</li>
-            <li>كل القطع تُنفَّذ يدويًا حسب الطلب</li>
-          </ul>
         </div>
 
         <div>

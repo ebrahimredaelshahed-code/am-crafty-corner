@@ -36,7 +36,7 @@ export const DEFAULT_SETTINGS: Settings = {
   instagram: "https://instagram.com",
   tiktok: "https://tiktok.com",
   about:
-    "A @ M متجر متخصص في المشغولات اليدوية من الكروشيه والمكرميه والشنط، كل قطعة تُصنع يدويًا بخامات مختارة بعناية وبلمسة خاصة تناسب ذوقك.",
+    "A @ M متجر متخصص في المشغولات اليدوية من الكروشيه والمكرميه، كل قطعة تُصنع يدويًا بخامات مختارة بعناية وبلمسة خاصة تناسب ذوقك.",
 };
 
 export const DEFAULT_PRODUCTS: Product[] = [
