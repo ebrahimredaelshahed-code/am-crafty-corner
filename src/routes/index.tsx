@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ImagePlus, Send, Sparkles } from "lucide-react";
-import { useEffect, useState } from "react";
+import { Send, Sparkles } from "lucide-react";
+import { useState } from "react";
 
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteFooter } from "@/components/SiteFooter";
@@ -120,25 +120,13 @@ function Home() {
 }
 
 function CustomDesignForm() {
-  const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
   const [details, setDetails] = useState("");
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState("");
 
-  useEffect(() => {
-    if (!image) {
-      setPreview(null);
-      return;
-    }
-    const url = URL.createObjectURL(image);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [image]);
-
   const sendOrder = () => {
-    if (!image || !details.trim()) {
-      setStatus("أرفقي صورة واكتبي تفاصيل التصميم أولًا.");
+    if (!details.trim()) {
+      setStatus("اكتبي تفاصيل التصميم أولًا.");
       return;
     }
 
@@ -147,28 +135,7 @@ function CustomDesignForm() {
   };
 
   return (
-    <div className="mx-auto grid max-w-4xl gap-8 rounded-3xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] md:grid-cols-[0.9fr_1.1fr] md:p-8">
-      <div className="flex min-h-72 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-primary/40 bg-secondary/40 p-5 text-center">
-        {preview ? (
-          <img
-            src={preview}
-            alt="معاينة التصميم"
-            className="h-64 w-full rounded-xl object-contain"
-          />
-        ) : (
-          <ImagePlus className="mb-4 h-12 w-12 text-primary" />
-        )}
-        <label className="mt-4 cursor-pointer rounded-xl bg-primary px-5 py-3 text-sm font-semibold text-primary-foreground hover:opacity-90">
-          {image ? "تغيير الصورة" : "أرفقي صورة التصميم"}
-          <input
-            type="file"
-            accept="image/*"
-            className="sr-only"
-            onChange={(event) => setImage(event.target.files?.[0] ?? null)}
-          />
-        </label>
-        <p className="mt-3 text-xs text-muted-foreground">صورة واحدة بصيغة JPG أو PNG</p>
-      </div>
+    <div className="mx-auto max-w-2xl rounded-3xl border border-border bg-card p-6 shadow-[var(--shadow-soft)] md:p-8">
       <div className="space-y-5">
         <div>
           <h2 className="font-display text-2xl font-bold text-card-foreground">
