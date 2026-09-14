@@ -13,7 +13,6 @@ import {
   useSettings,
   type CategoryId,
 } from "@/lib/store";
-import { useLanguage } from "@/lib/i18n";
 
 const CUSTOM_DESIGN_WHATSAPP = "https://wa.me/201066063038";
 
@@ -37,7 +36,6 @@ export const Route = createFileRoute("/")({
 });
 
 function Home() {
-  const { t } = useLanguage();
   const { products } = useProducts();
   const { settings } = useSettings();
   const [active, setActive] = useState<CategoryId | "custom">(() => {
@@ -55,15 +53,16 @@ function Home() {
       <main className="mx-auto max-w-6xl px-4">
         <section className="py-14 text-center">
           <h1 className="font-display text-3xl font-bold leading-relaxed text-foreground md:text-5xl">
-            {t("welcome")} <span className="text-primary">A @ M</span>
+            أهلاً بيكِ في متجر <span className="text-primary">A @ M</span>
           </h1>
           <p className="mx-auto mt-4 max-w-2xl text-base leading-8 text-muted-foreground md:text-lg">
-            {t("intro")}
+            كل قطعة هنا مشغولة بالإيد بحب واهتمام… اختاري التبويب اللي يعجبك واستعرضي الكتالوجات،
+            والطلب يوصلنا مباشرة على الواتساب.
           </p>
         </section>
 
         <nav
-          aria-label={t("catalogTabs")}
+          aria-label="تبويبات عرض المنتجات"
           className="mx-auto flex w-fit flex-wrap justify-center gap-2 rounded-full border border-border bg-secondary/70 p-2"
         >
           {CATEGORIES.map((cat) => (
@@ -79,7 +78,7 @@ function Home() {
                   : "text-muted-foreground hover:bg-background")
               }
             >
-              {t(cat.id)}
+              {cat.label}
             </button>
           ))}
           <button
@@ -94,7 +93,7 @@ function Home() {
             }
           >
             <Sparkles className="h-4 w-4" />
-            {t("custom")}
+            تصميمك الخاص
           </button>
         </nav>
 
@@ -103,7 +102,7 @@ function Home() {
             <CustomDesignForm />
           ) : visible.length === 0 ? (
             <p className="rounded-2xl border border-dashed border-border p-12 text-center text-muted-foreground">
-              {t("noProducts")}
+              لا توجد منتجات في هذا التبويب حاليًا، تابعينا قريبًا.
             </p>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -121,7 +120,6 @@ function Home() {
 }
 
 function CustomDesignForm() {
-  const { t } = useLanguage();
   const [details, setDetails] = useState("");
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState("");
@@ -141,25 +139,27 @@ function CustomDesignForm() {
       <div className="space-y-5">
         <div>
           <h2 className="font-display text-2xl font-bold text-card-foreground">
-            {t("customTitle")}
+            صممي قطعتك على ذوقك
           </h2>
-          <p className="mt-2 text-sm leading-7 text-muted-foreground">{t("customIntro")}</p>
+          <p className="mt-2 text-sm leading-7 text-muted-foreground">
+            ابعتي فكرتك، وسنرجع لكِ بالتفاصيل والتكلفة المناسبة.
+          </p>
         </div>
         <label className="block space-y-2 text-sm font-semibold text-card-foreground">
-          {t("designDetails")} <span className="text-primary">*</span>
+          تفاصيل التصميم <span className="text-primary">*</span>
           <textarea
             value={details}
             onChange={(event) => setDetails(event.target.value)}
-            placeholder={t("designPlaceholder")}
+            placeholder="نوع القطعة، المقاس، الألوان والخامة..."
             className="min-h-32 w-full rounded-xl border border-input bg-background px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-ring"
           />
         </label>
         <label className="block space-y-2 text-sm font-semibold text-card-foreground">
-          {t("extraNotes")}
+          ملاحظات إضافية
           <textarea
             value={notes}
             onChange={(event) => setNotes(event.target.value)}
-            placeholder={t("notesPlaceholder")}
+            placeholder="أي ملاحظات أو تفاصيل إضافية"
             className="min-h-24 w-full rounded-xl border border-input bg-background px-4 py-3 font-normal outline-none focus:ring-2 focus:ring-ring"
           />
         </label>
@@ -169,7 +169,7 @@ function CustomDesignForm() {
           className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-5 py-3 font-semibold text-primary-foreground hover:opacity-90"
         >
           <Send className="h-4 w-4" />
-          {t("sendDesign")}
+          إرسال التصميم عبر واتساب
         </button>
         {status ? <p className="text-center text-sm text-muted-foreground">{status}</p> : null}
       </div>

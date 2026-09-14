@@ -7,11 +7,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { buildProductOrderMessage, buildWhatsappLink, type Product } from "@/lib/store";
-import { getCategoryLabel, useLanguage } from "@/lib/i18n";
+import {
+  buildProductOrderMessage,
+  buildWhatsappLink,
+  categoryLabel,
+  type Product,
+} from "@/lib/store";
 
 export function ProductCard({ product, whatsapp }: { product: Product; whatsapp: string }) {
-  const { language, t } = useLanguage();
   const href = buildWhatsappLink(product, whatsapp);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const images = product.images?.length ? product.images : [product.image];
@@ -41,7 +44,7 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
       </div>
       <div className="space-y-2 p-5">
         <span className="inline-block rounded-full bg-secondary px-3 py-1 text-xs text-secondary-foreground">
-          {getCategoryLabel(product.category, language)}
+          {categoryLabel(product.category)}
         </span>
         <h3 className="font-display text-lg font-semibold text-card-foreground">{product.name}</h3>
         <p className="text-sm leading-7 text-muted-foreground">{product.details}</p>
@@ -52,7 +55,7 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
             className="inline-flex items-center justify-center gap-2 rounded-xl border border-border px-4 py-3 text-sm font-semibold text-card-foreground transition-colors hover:bg-secondary cursor-pointer"
           >
             <Eye className="h-4 w-4" />
-            {t("details")}
+            عرض التفاصيل
           </button>
           <button
             type="button"
@@ -60,7 +63,7 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
             className="inline-flex items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 cursor-pointer border-0"
           >
             <MessageCircle className="h-4 w-4" />
-            {t("order")}
+            اطلب الآن
           </button>
         </div>
       </div>
@@ -68,7 +71,7 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
         <DialogContent dir="rtl" className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
           <DialogHeader className="text-right">
             <DialogTitle className="font-display text-2xl">{product.name}</DialogTitle>
-            <DialogDescription>{getCategoryLabel(product.category, language)}</DialogDescription>
+            <DialogDescription>{categoryLabel(product.category)}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-5 sm:grid-cols-[minmax(0,0.9fr)_1.1fr] sm:items-start">
             <div className="space-y-3">
@@ -82,7 +85,7 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
                   <>
                     <button
                       type="button"
-                      aria-label={t("previous")}
+                      aria-label="الصورة السابقة"
                       onClick={() =>
                         setActiveImage((current) => (current - 1 + images.length) % images.length)
                       }
@@ -92,7 +95,7 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
                     </button>
                     <button
                       type="button"
-                      aria-label={t("next")}
+                      aria-label="الصورة التالية"
                       onClick={() => setActiveImage((current) => (current + 1) % images.length)}
                       className="absolute left-3 top-1/2 rounded-full bg-background/90 p-2 text-foreground shadow transition-colors hover:bg-background"
                     >
@@ -107,7 +110,7 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
                     <button
                       key={`${image}-${index}`}
                       type="button"
-                      aria-label={`${t("showImage")} ${index + 1}`}
+                      aria-label={`عرض الصورة ${index + 1}`}
                       aria-pressed={activeImage === index}
                       onClick={() => setActiveImage(index)}
                       className={`shrink-0 overflow-hidden rounded-lg border-2 ${
@@ -122,19 +125,17 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
             </div>
             <div className="space-y-4 text-right">
               <div>
-                <p className="text-sm font-semibold text-muted-foreground">{t("type")}</p>
-                <p className="mt-1 text-card-foreground">
-                  {getCategoryLabel(product.category, language)}
-                </p>
+                <p className="text-sm font-semibold text-muted-foreground">النوع</p>
+                <p className="mt-1 text-card-foreground">{categoryLabel(product.category)}</p>
               </div>
               {product.price ? (
                 <div>
-                  <p className="text-sm font-semibold text-muted-foreground">{t("price")}</p>
+                  <p className="text-sm font-semibold text-muted-foreground">السعر</p>
                   <p className="mt-1 font-semibold text-primary">{product.price}</p>
                 </div>
               ) : null}
               <div>
-                <p className="text-sm font-semibold text-muted-foreground">{t("productDetails")}</p>
+                <p className="text-sm font-semibold text-muted-foreground">التفاصيل</p>
                 <p className="mt-1 leading-7 text-card-foreground">{product.details}</p>
               </div>
               <button
@@ -143,7 +144,7 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-3 text-sm font-semibold text-primary-foreground transition-opacity hover:opacity-90 cursor-pointer border-0"
               >
                 <MessageCircle className="h-4 w-4" />
-                {t("orderWhatsapp")}
+                اطلب الآن عبر واتساب
               </button>
             </div>
           </div>
