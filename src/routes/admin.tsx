@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { ImagePlus, Trash2 } from "lucide-react";
+import { ChevronDown, ImagePlus, Pencil, Save, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -46,6 +46,8 @@ function Admin() {
   const { settings, save: saveSettings } = useSettings();
   const [form, setForm] = useState(emptyForm);
   const [contact, setContact] = useState(settings);
+  const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const onImageFiles = (files: FileList) => {
     const selectedFiles = Array.from(files);
@@ -66,40 +68,6 @@ function Admin() {
           }),
       ),
     ).then((images) => setForm((current) => ({ ...current, image: images[0] ?? "", images })));
-  };
-
-  const addImagesToProduct = async (product: Product, files: FileList) => {
-    const selectedFiles = Array.from(files);
-    const oversizedFile = selectedFiles.find((file) => file.size > 2_000_000);
-    if (oversizedFile) {
-      toast.error("حجم إحدى الصور كبير، اختاري صورًا أقل من 2 ميجابايت للصورة");
-      return;
-    }
-
-    try {
-      const newImages = await Promise.all(
-        selectedFiles.map(
-          (file) =>
-            new Promise<string>((resolve, reject) => {
-              const reader = new FileReader();
-              reader.onload = () => resolve(String(reader.result));
-              reader.onerror = reject;
-              reader.readAsDataURL(file);
-            }),
-        ),
-      );
-      const currentImages = product.images?.length ? product.images : [product.image];
-      await save(
-        products.map((currentProduct) =>
-          currentProduct.id === product.id
-            ? { ...currentProduct, images: [...currentImages, ...newImages] }
-            : currentProduct,
-        ),
-      );
-      toast.success("تمت إضافة الصور إلى الكتالوج");
-    } catch {
-      toast.error("تعذر حفظ الصور على الخادم، تأكدي من إعداد قاعدة البيانات في Vercel");
-    }
   };
 
   const addProduct = async (e: FormEvent) => {
@@ -133,6 +101,60 @@ function Admin() {
     } catch {
       toast.error("تعذر حذف المنتج على الخادم، تأكدي من إعداد قاعدة البيانات في Vercel");
     }
+  };
+
+  const updateProduct = async () => {
+    if (!editingProduct?.name.trim() || !editingProduct.details.trim()) {
+      toast.error("من فضلك أكملي اسم المنتج والتفاصيل");
+      return;
+    }
+    try {
+      await save(
+        products.map((product) =>
+          product.id === editingProduct.id
+            ? {
+                ...editingProduct,
+                name: editingProduct.name.trim().slice(0, 120),
+                details: editingProduct.details.trim().slice(0, 600),
+                price: editingProduct.price.trim().slice(0, 40),
+                image: editingProduct.images?.[0] ?? editingProduct.image,
+              }
+            : product,
+        ),
+      );
+      setEditingProduct(null);
+      toast.success("تم تعديل الكتالوج");
+    } catch {
+      toast.error("تعذر حفظ التعديل على الخادم، تأكدي من إعداد قاعدة البيانات في Vercel");
+    }
+  };
+
+  const addImagesToEditingProduct = (files: FileList) => {
+    const selectedFiles = Array.from(files);
+    if (selectedFiles.some((file) => file.size > 2_000_000)) {
+      toast.error("حجم إحدى الصور كبير، اختاري صورًا أقل من 2 ميجابايت للصورة");
+      return;
+    }
+    Promise.all(
+      selectedFiles.map(
+        (file) =>
+          new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result));
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          }),
+      ),
+    ).then((images) =>
+      setEditingProduct((product) =>
+        product
+          ? {
+              ...product,
+              images: [...(product.images?.length ? product.images : [product.image]), ...images],
+            }
+          : product,
+      ),
+    );
   };
 
   return (
@@ -291,47 +313,195 @@ function Admin() {
               </div>
               <ul className="mt-4 space-y-3">
                 {products.map((p) => (
-                  <li
-                    key={p.id}
-                    className="flex items-center gap-3 rounded-xl border border-border p-3"
-                  >
-                    <img
-                      src={p.image}
-                      alt={p.name}
-                      loading="lazy"
-                      className="h-14 w-14 rounded-lg object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate font-medium">{p.name}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {categoryLabel(p.category)} {p.price ? `· ${p.price}` : ""} ·{" "}
-                        {p.images?.length ?? 1} صور
-                      </p>
-                    </div>
-                    <label
-                      title="إضافة صور للكتالوج"
-                      className="cursor-pointer rounded-lg p-2 text-primary transition-colors hover:bg-secondary"
-                    >
-                      <ImagePlus className="h-4 w-4" />
-                      <input
-                        type="file"
-                        accept="image/*"
-                        multiple
-                        className="sr-only"
-                        onChange={(event) => {
-                          if (event.target.files?.length) addImagesToProduct(p, event.target.files);
-                          event.target.value = "";
-                        }}
+                  <li key={p.id} className="rounded-xl border border-border p-3">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={p.images?.[0] ?? p.image}
+                        alt={p.name}
+                        loading="lazy"
+                        className="h-14 w-14 rounded-lg object-cover"
                       />
-                    </label>
-                    <button
-                      type="button"
-                      aria-label={`حذف ${p.name}`}
-                      onClick={() => remove(p.id)}
-                      className="rounded-lg p-2 text-destructive transition-colors hover:bg-destructive/10"
-                    >
-                      <Trash2 className="h-4 w-4" />
-                    </button>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-medium">{p.name}</p>
+                        <p className="text-xs text-muted-foreground">
+                          {categoryLabel(p.category)} {p.price ? `· ${p.price}` : ""} ·{" "}
+                          {p.images?.length ?? 1} صور
+                        </p>
+                      </div>
+                      <button
+                        type="button"
+                        aria-label={`عرض محتوى ${p.name}`}
+                        onClick={() =>
+                          setExpandedProduct((current) => (current === p.id ? null : p.id))
+                        }
+                        className="rounded-lg p-2 text-muted-foreground transition-colors hover:bg-secondary"
+                      >
+                        <ChevronDown
+                          className={`h-4 w-4 transition-transform ${expandedProduct === p.id ? "rotate-180" : ""}`}
+                        />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`تعديل ${p.name}`}
+                        onClick={() => {
+                          setExpandedProduct(p.id);
+                          setEditingProduct({
+                            ...p,
+                            images: p.images?.length ? [...p.images] : [p.image],
+                          });
+                        }}
+                        className="rounded-lg p-2 text-primary transition-colors hover:bg-secondary"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={`حذف ${p.name}`}
+                        onClick={() => remove(p.id)}
+                        className="rounded-lg p-2 text-destructive transition-colors hover:bg-destructive/10"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </button>
+                    </div>
+                    {expandedProduct === p.id ? (
+                      <div className="mt-4 space-y-4 border-t border-border pt-4">
+                        {editingProduct?.id === p.id ? (
+                          <>
+                            <div className="grid gap-3 sm:grid-cols-2">
+                              <Field label="اسم المنتج">
+                                <input
+                                  className={inputCls}
+                                  value={editingProduct.name}
+                                  onChange={(event) =>
+                                    setEditingProduct({
+                                      ...editingProduct,
+                                      name: event.target.value,
+                                    })
+                                  }
+                                />
+                              </Field>
+                              <Field label="التبويب / النوع">
+                                <select
+                                  className={inputCls}
+                                  value={editingProduct.category}
+                                  onChange={(event) =>
+                                    setEditingProduct({
+                                      ...editingProduct,
+                                      category: event.target.value as CategoryId,
+                                    })
+                                  }
+                                >
+                                  {CATEGORIES.map((category) => (
+                                    <option key={category.id} value={category.id}>
+                                      {category.label}
+                                    </option>
+                                  ))}
+                                </select>
+                              </Field>
+                            </div>
+                            <Field label="السعر">
+                              <input
+                                className={inputCls}
+                                value={editingProduct.price}
+                                onChange={(event) =>
+                                  setEditingProduct({
+                                    ...editingProduct,
+                                    price: event.target.value,
+                                  })
+                                }
+                              />
+                            </Field>
+                            <Field label="التفاصيل">
+                              <textarea
+                                className={inputCls + " min-h-24"}
+                                value={editingProduct.details}
+                                onChange={(event) =>
+                                  setEditingProduct({
+                                    ...editingProduct,
+                                    details: event.target.value,
+                                  })
+                                }
+                              />
+                            </Field>
+                            <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                              {(editingProduct.images?.length
+                                ? editingProduct.images
+                                : [editingProduct.image]
+                              ).map((image, index, images) => (
+                                <div key={`${image}-${index}`} className="relative">
+                                  <img
+                                    src={image}
+                                    alt={`صورة ${index + 1}`}
+                                    className="aspect-square w-full rounded-lg object-cover"
+                                  />
+                                  <button
+                                    type="button"
+                                    aria-label={`حذف الصورة ${index + 1}`}
+                                    onClick={() =>
+                                      setEditingProduct({
+                                        ...editingProduct,
+                                        images: images.filter(
+                                          (_, imageIndex) => imageIndex !== index,
+                                        ),
+                                      })
+                                    }
+                                    className="absolute right-1 top-1 rounded-full bg-background/90 p-1 text-destructive"
+                                  >
+                                    <X className="h-3 w-3" />
+                                  </button>
+                                </div>
+                              ))}
+                            </div>
+                            <div className="flex flex-wrap gap-2">
+                              <label className="inline-flex cursor-pointer items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-semibold hover:bg-secondary">
+                                <ImagePlus className="h-4 w-4" />
+                                إضافة صور
+                                <input
+                                  type="file"
+                                  accept="image/*"
+                                  multiple
+                                  className="sr-only"
+                                  onChange={(event) => {
+                                    if (event.target.files?.length)
+                                      addImagesToEditingProduct(event.target.files);
+                                    event.target.value = "";
+                                  }}
+                                />
+                              </label>
+                              <button
+                                type="button"
+                                onClick={updateProduct}
+                                className="inline-flex items-center gap-2 rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:opacity-90"
+                              >
+                                <Save className="h-4 w-4" />
+                                حفظ التعديل
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => setEditingProduct(null)}
+                                className="rounded-xl border border-border px-4 py-2 text-sm font-semibold hover:bg-secondary"
+                              >
+                                إلغاء
+                              </button>
+                            </div>
+                          </>
+                        ) : (
+                          <div className="space-y-3">
+                            <p className="leading-7 text-muted-foreground">{p.details}</p>
+                            <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
+                              {(p.images?.length ? p.images : [p.image]).map((image, index) => (
+                                <img
+                                  key={`${image}-${index}`}
+                                  src={image}
+                                  alt={`${p.name} - صورة ${index + 1}`}
+                                  className="aspect-square w-full rounded-lg object-cover"
+                                />
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    ) : null}
                   </li>
                 ))}
               </ul>
