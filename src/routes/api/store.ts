@@ -56,7 +56,8 @@ export const Route = createFileRoute("/api/store")({
     handlers: {
       GET: async () => {
         const databaseUrl = getDatabaseUrl();
-        if (!databaseUrl) return Response.json({ error: "Database is not configured" }, { status: 503 });
+        if (!databaseUrl)
+          return Response.json({ error: "Database is not configured" }, { status: 503 });
         const sql = neon(databaseUrl);
         return Response.json(await readStore(sql), {
           headers: { "cache-control": "no-store" },
@@ -64,9 +65,13 @@ export const Route = createFileRoute("/api/store")({
       },
       PUT: async ({ request }) => {
         const databaseUrl = getDatabaseUrl();
-        if (!databaseUrl) return Response.json({ error: "Database is not configured" }, { status: 503 });
+        if (!databaseUrl)
+          return Response.json({ error: "Database is not configured" }, { status: 503 });
         const sql = neon(databaseUrl);
-        const body = (await parseJson(request)) as { products?: Product[]; settings?: Settings } | null;
+        const body = (await parseJson(request)) as {
+          products?: Product[];
+          settings?: Settings;
+        } | null;
         if (!body || (!body.products && !body.settings)) {
           return Response.json({ error: "Invalid store payload" }, { status: 400 });
         }
@@ -78,4 +83,3 @@ export const Route = createFileRoute("/api/store")({
     },
   },
 });
-
