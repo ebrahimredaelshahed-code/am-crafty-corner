@@ -19,7 +19,6 @@ export type Product = {
   name: string;
   category: CategoryId;
   details: string;
-  price: string;
   image: string;
   images?: string[];
 };
@@ -47,7 +46,6 @@ export const DEFAULT_PRODUCTS: Product[] = [
     name: "شنطة كروشيه بيضاء بوردة",
     category: "crochet",
     details: "شنطة كروشيه قطن 100% بمقاس متوسط، خفيفة ومتينة ومناسبة للاستخدام اليومي.",
-    price: "450 ج.م",
     image: crochetImg,
   },
   {
@@ -55,7 +53,6 @@ export const DEFAULT_PRODUCTS: Product[] = [
     name: "معلقة مكرميه للحائط",
     category: "macrame",
     details: "معلقة حائط مكرميه بحبل قطن طبيعي وشماعة خشب، مقاس 40×70 سم.",
-    price: "600 ج.م",
     image: macrameImg,
   },
   {
@@ -63,7 +60,6 @@ export const DEFAULT_PRODUCTS: Product[] = [
     name: "شنطة يد بأيادي خشب",
     category: "bags",
     details: "شنطة يد بتصميم مميز بلونين وأيادي خشبية، بطانة داخلية وجيب صغير.",
-    price: "750 ج.م",
     image: bagImg,
   },
 ];
@@ -148,7 +144,6 @@ export function buildProductOrderMessage(product: Product) {
     "",
     `اسم المنتج: ${product.name}`,
     `النوع: ${categoryLabel(product.category)}`,
-    `السعر: ${product.price || "غير محدد"}`,
     `التفاصيل: ${product.details}`,
     `رابط الكتالوج: ${productLink}`,
   ].join("\n");

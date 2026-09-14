@@ -36,7 +36,6 @@ const emptyForm = {
   name: "",
   category: "crochet" as CategoryId,
   details: "",
-  price: "",
   image: "",
   images: [] as string[],
 };
@@ -81,7 +80,6 @@ function Admin() {
       name: form.name.trim().slice(0, 120),
       category: form.category,
       details: form.details.trim().slice(0, 600),
-      price: form.price.trim().slice(0, 40),
       image: form.image,
       images: form.images,
     };
@@ -116,7 +114,6 @@ function Admin() {
                 ...editingProduct,
                 name: editingProduct.name.trim().slice(0, 120),
                 details: editingProduct.details.trim().slice(0, 600),
-                price: editingProduct.price.trim().slice(0, 40),
                 image: editingProduct.images?.[0] ?? editingProduct.image,
               }
             : product,
@@ -324,8 +321,7 @@ function Admin() {
                       <div className="min-w-0 flex-1">
                         <p className="truncate font-medium">{p.name}</p>
                         <p className="text-xs text-muted-foreground">
-                          {categoryLabel(p.category)} {p.price ? `· ${p.price}` : ""} ·{" "}
-                          {p.images?.length ?? 1} صور
+                          {categoryLabel(p.category)} · {p.images?.length ?? 1} صور
                         </p>
                       </div>
                       <button
@@ -399,18 +395,6 @@ function Admin() {
                                 </select>
                               </Field>
                             </div>
-                            <Field label="السعر">
-                              <input
-                                className={inputCls}
-                                value={editingProduct.price}
-                                onChange={(event) =>
-                                  setEditingProduct({
-                                    ...editingProduct,
-                                    price: event.target.value,
-                                  })
-                                }
-                              />
-                            </Field>
                             <Field label="التفاصيل">
                               <textarea
                                 className={inputCls + " min-h-24"}

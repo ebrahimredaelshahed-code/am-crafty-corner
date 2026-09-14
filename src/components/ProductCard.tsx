@@ -128,12 +128,6 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
                 <p className="text-sm font-semibold text-muted-foreground">النوع</p>
                 <p className="mt-1 text-card-foreground">{categoryLabel(product.category)}</p>
               </div>
-              {product.price ? (
-                <div>
-                  <p className="text-sm font-semibold text-muted-foreground">السعر</p>
-                  <p className="mt-1 font-semibold text-primary">{product.price}</p>
-                </div>
-              ) : null}
               <div>
                 <p className="text-sm font-semibold text-muted-foreground">التفاصيل</p>
                 <p className="mt-1 leading-7 text-card-foreground">{product.details}</p>
