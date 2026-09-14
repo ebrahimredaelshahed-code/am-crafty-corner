@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, type FormEvent } from "react";
-import { Trash2 } from "lucide-react";
+import { ImagePlus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -66,6 +66,40 @@ function Admin() {
           }),
       ),
     ).then((images) => setForm((current) => ({ ...current, image: images[0] ?? "", images })));
+  };
+
+  const addImagesToProduct = async (product: Product, files: FileList) => {
+    const selectedFiles = Array.from(files);
+    const oversizedFile = selectedFiles.find((file) => file.size > 2_000_000);
+    if (oversizedFile) {
+      toast.error("حجم إحدى الصور كبير، اختاري صورًا أقل من 2 ميجابايت للصورة");
+      return;
+    }
+
+    try {
+      const newImages = await Promise.all(
+        selectedFiles.map(
+          (file) =>
+            new Promise<string>((resolve, reject) => {
+              const reader = new FileReader();
+              reader.onload = () => resolve(String(reader.result));
+              reader.onerror = reject;
+              reader.readAsDataURL(file);
+            }),
+        ),
+      );
+      const currentImages = product.images?.length ? product.images : [product.image];
+      await save(
+        products.map((currentProduct) =>
+          currentProduct.id === product.id
+            ? { ...currentProduct, images: [...currentImages, ...newImages] }
+            : currentProduct,
+        ),
+      );
+      toast.success("تمت إضافة الصور إلى الكتالوج");
+    } catch {
+      toast.error("تعذر حفظ الصور على الخادم، تأكدي من إعداد قاعدة البيانات في Vercel");
+    }
   };
 
   const addProduct = async (e: FormEvent) => {
@@ -270,9 +304,26 @@ function Admin() {
                     <div className="min-w-0 flex-1">
                       <p className="truncate font-medium">{p.name}</p>
                       <p className="text-xs text-muted-foreground">
-                        {categoryLabel(p.category)} {p.price ? `· ${p.price}` : ""}
+                        {categoryLabel(p.category)} {p.price ? `· ${p.price}` : ""} ·{" "}
+                        {p.images?.length ?? 1} صور
                       </p>
                     </div>
+                    <label
+                      title="إضافة صور للكتالوج"
+                      className="cursor-pointer rounded-lg p-2 text-primary transition-colors hover:bg-secondary"
+                    >
+                      <ImagePlus className="h-4 w-4" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        className="sr-only"
+                        onChange={(event) => {
+                          if (event.target.files?.length) addImagesToProduct(p, event.target.files);
+                          event.target.value = "";
+                        }}
+                      />
+                    </label>
                     <button
                       type="button"
                       aria-label={`حذف ${p.name}`}
