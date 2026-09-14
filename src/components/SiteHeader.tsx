@@ -1,6 +1,9 @@
 import { Link } from "@tanstack/react-router";
+import { Languages } from "lucide-react";
+import { useLanguage } from "@/lib/i18n";
 
 export function SiteHeader() {
+  const { t, toggleLanguage } = useLanguage();
   return (
     <header className="sticky top-0 z-30 border-b border-border/70 bg-background/85 backdrop-blur">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-3">
@@ -21,6 +24,16 @@ export function SiteHeader() {
             </span>
           </span>
         </Link>
+        <button
+          type="button"
+          onClick={toggleLanguage}
+          title={t("switchLanguage")}
+          aria-label={t("switchLanguage")}
+          className="absolute left-4 inline-flex items-center gap-2 rounded-full border border-border bg-background/80 px-3 py-2 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
+        >
+          <Languages className="h-4 w-4" />
+          <span>{t("switchLanguage")}</span>
+        </button>
       </div>
     </header>
   );

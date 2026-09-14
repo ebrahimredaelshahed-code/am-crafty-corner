@@ -12,6 +12,7 @@ import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
+import { LanguageProvider } from "@/lib/i18n";
 
 const siteUrl = import.meta.env.VITE_SITE_URL?.replace(/\/$/, "");
 const socialImage = siteUrl ? `${siteUrl}/favicon.png` : "/favicon.png";
@@ -127,7 +128,7 @@ function RootShell({ children }: { children: ReactNode }) {
         <HeadContent />
       </head>
       <body>
-        {children}
+        <LanguageProvider>{children}</LanguageProvider>
         <Toaster position="top-center" richColors />
         <Scripts />
       </body>

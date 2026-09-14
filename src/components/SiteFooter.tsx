@@ -1,8 +1,10 @@
 import { Facebook, Instagram, MessageCircle, Music2 } from "lucide-react";
 import { useSettings } from "@/lib/store";
+import { useLanguage } from "@/lib/i18n";
 
 export function SiteFooter() {
   const { settings } = useSettings();
+  const { t } = useLanguage();
   const waLink = `whatsapp://send?phone=${settings.whatsapp.replace(/[^\d]/g, "")}`;
 
   return (
@@ -10,7 +12,7 @@ export function SiteFooter() {
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-14 md:grid-cols-[1.1fr_0.9fr] md:gap-16">
         <div className="text-center md:text-right">
           <p className="text-xs font-semibold uppercase tracking-[0.28em] text-primary/75">
-            نهتم بأدق التفاصيل
+            {t("care")}
           </p>
           <h2 className="mt-2 font-display text-3xl font-bold text-primary">A @ M</h2>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-8 text-muted-foreground md:mx-0">
@@ -19,25 +21,25 @@ export function SiteFooter() {
         </div>
 
         <div className="border-t border-border/80 pt-6 text-center md:border-t-0 md:border-r md:pt-0 md:pr-10 md:text-right">
-          <h3 className="font-display text-2xl font-semibold text-foreground">تواصل معنا</h3>
+          <h3 className="font-display text-2xl font-semibold text-foreground">{t("contact")}</h3>
           <div className="mt-5 flex flex-wrap justify-center gap-3 md:justify-start">
-            <SocialButton href={waLink} label="واتساب">
+            <SocialButton href={waLink} label={t("whatsapp")}>
               <MessageCircle className="h-4 w-4" />
             </SocialButton>
-            <SocialButton href={settings.facebook} label="فيسبوك">
+            <SocialButton href={settings.facebook} label={t("facebook")}>
               <Facebook className="h-4 w-4" />
             </SocialButton>
-            <SocialButton href={settings.instagram} label="انستجرام">
+            <SocialButton href={settings.instagram} label={t("instagram")}>
               <Instagram className="h-4 w-4" />
             </SocialButton>
-            <SocialButton href={settings.tiktok} label="تيك توك">
+            <SocialButton href={settings.tiktok} label={t("tiktok")}>
               <Music2 className="h-4 w-4" />
             </SocialButton>
           </div>
         </div>
       </div>
       <div className="border-t border-border/70 px-4 py-5 text-center text-xs text-muted-foreground">
-        © {new Date().getFullYear()} A @ M — جميع الحقوق محفوظة
+        © {new Date().getFullYear()} A @ M · {t("rights")}
       </div>
     </footer>
   );
