@@ -38,6 +38,7 @@ const emptyForm = {
   details: "",
   price: "",
   image: "",
+  images: [] as string[],
 };
 
 function Admin() {
@@ -46,14 +47,25 @@ function Admin() {
   const [form, setForm] = useState(emptyForm);
   const [contact, setContact] = useState(settings);
 
-  const onImageFile = (file: File) => {
-    if (file.size > 2_000_000) {
-      toast.error("حجم الصورة كبير، اختاري صورة أقل من 2 ميجابايت");
+  const onImageFiles = (files: FileList) => {
+    const selectedFiles = Array.from(files);
+    const oversizedFile = selectedFiles.find((file) => file.size > 2_000_000);
+    if (oversizedFile) {
+      toast.error("حجم إحدى الصور كبير، اختاري صورًا أقل من 2 ميجابايت للصورة");
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => setForm((f) => ({ ...f, image: String(reader.result) }));
-    reader.readAsDataURL(file);
+
+    Promise.all(
+      selectedFiles.map(
+        (file) =>
+          new Promise<string>((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(String(reader.result));
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+          }),
+      ),
+    ).then((images) => setForm((current) => ({ ...current, image: images[0] ?? "", images })));
   };
 
   const addProduct = async (e: FormEvent) => {
@@ -69,6 +81,7 @@ function Admin() {
       details: form.details.trim().slice(0, 600),
       price: form.price.trim().slice(0, 40),
       image: form.image,
+      images: form.images,
     };
     try {
       await save([product, ...products]);
@@ -136,20 +149,25 @@ function Admin() {
               <input
                 type="file"
                 accept="image/*"
+                multiple
                 className={inputCls}
                 onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) onImageFile(file);
+                  if (e.target.files?.length) onImageFiles(e.target.files);
                 }}
               />
             </Field>
 
-            {form.image ? (
-              <img
-                src={form.image}
-                alt="معاينة صورة المنتج"
-                className="h-32 w-32 rounded-xl object-cover"
-              />
+            {form.images.length ? (
+              <div className="grid grid-cols-4 gap-2 sm:grid-cols-5">
+                {form.images.map((image, index) => (
+                  <img
+                    key={`${image}-${index}`}
+                    src={image}
+                    alt={`معاينة الصورة ${index + 1}`}
+                    className="aspect-square w-full rounded-xl object-cover"
+                  />
+                ))}
+              </div>
             ) : null}
 
             <button

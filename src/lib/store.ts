@@ -21,6 +21,7 @@ export type Product = {
   details: string;
   price: string;
   image: string;
+  images?: string[];
 };
 
 export type Settings = {

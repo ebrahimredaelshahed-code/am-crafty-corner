@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Eye, MessageCircle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Eye, MessageCircle } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -17,6 +17,8 @@ import {
 export function ProductCard({ product, whatsapp }: { product: Product; whatsapp: string }) {
   const href = buildWhatsappLink(product, whatsapp);
   const [detailsOpen, setDetailsOpen] = useState(false);
+  const images = product.images?.length ? product.images : [product.image];
+  const [activeImage, setActiveImage] = useState(0);
 
   const handleWhatsAppClick = (e: React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
@@ -32,7 +34,7 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
     >
       <div className="aspect-square overflow-hidden bg-muted">
         <img
-          src={product.image}
+          src={images[0]}
           alt={product.name}
           loading="lazy"
           width={768}
@@ -72,11 +74,55 @@ export function ProductCard({ product, whatsapp }: { product: Product; whatsapp:
             <DialogDescription>{categoryLabel(product.category)}</DialogDescription>
           </DialogHeader>
           <div className="grid gap-5 sm:grid-cols-[minmax(0,0.9fr)_1.1fr] sm:items-start">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="aspect-square w-full rounded-2xl object-cover"
-            />
+            <div className="space-y-3">
+              <div className="relative overflow-hidden rounded-2xl bg-muted">
+                <img
+                  src={images[activeImage]}
+                  alt={`${product.name} - صورة ${activeImage + 1}`}
+                  className="aspect-square w-full object-cover"
+                />
+                {images.length > 1 ? (
+                  <>
+                    <button
+                      type="button"
+                      aria-label="الصورة السابقة"
+                      onClick={() =>
+                        setActiveImage((current) => (current - 1 + images.length) % images.length)
+                      }
+                      className="absolute right-3 top-1/2 rounded-full bg-background/90 p-2 text-foreground shadow transition-colors hover:bg-background"
+                    >
+                      <ChevronRight className="h-5 w-5" />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="الصورة التالية"
+                      onClick={() => setActiveImage((current) => (current + 1) % images.length)}
+                      className="absolute left-3 top-1/2 rounded-full bg-background/90 p-2 text-foreground shadow transition-colors hover:bg-background"
+                    >
+                      <ChevronLeft className="h-5 w-5" />
+                    </button>
+                  </>
+                ) : null}
+              </div>
+              {images.length > 1 ? (
+                <div className="flex gap-2 overflow-x-auto pb-1">
+                  {images.map((image, index) => (
+                    <button
+                      key={`${image}-${index}`}
+                      type="button"
+                      aria-label={`عرض الصورة ${index + 1}`}
+                      aria-pressed={activeImage === index}
+                      onClick={() => setActiveImage(index)}
+                      className={`shrink-0 overflow-hidden rounded-lg border-2 ${
+                        activeImage === index ? "border-primary" : "border-transparent"
+                      }`}
+                    >
+                      <img src={image} alt="" className="h-14 w-14 object-cover" />
+                    </button>
+                  ))}
+                </div>
+              ) : null}
+            </div>
             <div className="space-y-4 text-right">
               <div>
                 <p className="text-sm font-semibold text-muted-foreground">النوع</p>
