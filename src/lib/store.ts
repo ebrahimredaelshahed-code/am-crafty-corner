@@ -1,9 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 
-import crochetImg from "@/assets/p-crochet.jpg";
-import macrameImg from "@/assets/p-macrame.jpg";
-import bagImg from "@/assets/p-bag.jpg";
-
 export type CategoryId = "crochet" | "macrame" | "bags";
 
 export const CATEGORIES: { id: CategoryId; label: string }[] = [
@@ -40,32 +36,13 @@ export const DEFAULT_SETTINGS: Settings = {
     "A @ M متجر متخصص في المشغولات اليدوية من الكروشيه والمكرميه والشنط، كل قطعة تُصنع يدويًا بخامات مختارة بعناية وبلمسة خاصة تناسب ذوقك.",
 };
 
-export const DEFAULT_PRODUCTS: Product[] = [
-  {
-    id: "seed-1",
-    name: "شنطة كروشيه بيضاء بوردة",
-    category: "crochet",
-    details: "شنطة كروشيه قطن 100% بمقاس متوسط، خفيفة ومتينة ومناسبة للاستخدام اليومي.",
-    image: crochetImg,
-  },
-  {
-    id: "seed-2",
-    name: "معلقة مكرميه للحائط",
-    category: "macrame",
-    details: "معلقة حائط مكرميه بحبل قطن طبيعي وشماعة خشب، مقاس 40×70 سم.",
-    image: macrameImg,
-  },
-  {
-    id: "seed-3",
-    name: "شنطة يد بأيادي خشب",
-    category: "bags",
-    details: "شنطة يد بتصميم مميز بلونين وأيادي خشبية، بطانة داخلية وجيب صغير.",
-    image: bagImg,
-  },
-];
-
 const PRODUCTS_KEY = "am-store-products";
 const SETTINGS_KEY = "am-store-settings";
+const LEGACY_DEFAULT_PRODUCT_IDS = new Set(["seed-1", "seed-2", "seed-3"]);
+
+export function withoutLegacyDefaultProducts(products: Product[]) {
+  return products.filter((product) => !LEGACY_DEFAULT_PRODUCT_IDS.has(product.id));
+}
 
 function read<T>(key: string, fallback: T): T {
   if (typeof window === "undefined") return fallback;
@@ -78,16 +55,16 @@ function read<T>(key: string, fallback: T): T {
 }
 
 export function useProducts() {
-  const [products, setProducts] = useState<Product[]>(DEFAULT_PRODUCTS);
+  const [products, setProducts] = useState<Product[]>([]);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
     fetch("/api/store")
       .then((response) => (response.ok ? response.json() : Promise.reject()))
       .then((data: { products?: Product[] }) => {
-        setProducts(data.products ?? DEFAULT_PRODUCTS);
+        setProducts(withoutLegacyDefaultProducts(data.products ?? []));
       })
-      .catch(() => setProducts(read(PRODUCTS_KEY, DEFAULT_PRODUCTS)))
+      .catch(() => setProducts(withoutLegacyDefaultProducts(read(PRODUCTS_KEY, []))))
       .finally(() => setReady(true));
   }, []);
 

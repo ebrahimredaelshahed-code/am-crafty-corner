@@ -5,7 +5,6 @@ import { toast } from "sonner";
 
 import {
   CATEGORIES,
-  DEFAULT_PRODUCTS,
   categoryLabel,
   useProducts,
   useSettings,
@@ -293,20 +292,6 @@ function Admin() {
                 <h2 className="font-display text-xl font-semibold">
                   المنتجات الحالية ({products.length})
                 </h2>
-                <button
-                  type="button"
-                  onClick={async () => {
-                    try {
-                      await save(DEFAULT_PRODUCTS);
-                      toast.success("تمت الاستعادة للمنتجات الافتراضية");
-                    } catch {
-                      toast.error("تعذر الاستعادة، تأكدي من إعداد قاعدة البيانات في Vercel");
-                    }
-                  }}
-                  className="text-xs text-muted-foreground underline"
-                >
-                  استعادة الافتراضي
-                </button>
               </div>
               <ul className="mt-4 space-y-3">
                 {products.map((p) => (

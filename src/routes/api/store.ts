@@ -1,7 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { neon } from "@neondatabase/serverless";
 
-import { DEFAULT_PRODUCTS, DEFAULT_SETTINGS, type Product, type Settings } from "@/lib/store";
+import {
+  DEFAULT_SETTINGS,
+  type Product,
+  type Settings,
+  withoutLegacyDefaultProducts,
+} from "@/lib/store";
 
 type StoreRow = { key: string; value: Product[] | Settings };
 
@@ -26,11 +31,14 @@ async function readStore(sql: ReturnType<typeof neon>) {
     settings?: Settings;
   };
 
-  if (!data.products) await writeValue(sql, "products", DEFAULT_PRODUCTS);
+  const products = withoutLegacyDefaultProducts(data.products ?? []);
+  if (!data.products || products.length !== data.products.length) {
+    await writeValue(sql, "products", products);
+  }
   if (!data.settings) await writeValue(sql, "settings", DEFAULT_SETTINGS);
 
   return {
-    products: data.products ?? DEFAULT_PRODUCTS,
+    products,
     settings: data.settings ?? DEFAULT_SETTINGS,
   };
 }
