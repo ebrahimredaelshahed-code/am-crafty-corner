@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, type FormEvent } from "react";
-import { ChevronDown, ImagePlus, Pencil, Save, Trash2, X } from "lucide-react";
+import { useEffect, useState, type FormEvent } from "react";
+import { ChevronDown, ImagePlus, LogOut, Pencil, Save, Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -39,13 +39,41 @@ const emptyForm = {
   images: [] as string[],
 };
 
+const ADMIN_SESSION_KEY = "am-admin-authenticated";
+
 function Admin() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [loginError, setLoginError] = useState(false);
   const { products, save } = useProducts();
   const { settings, save: saveSettings } = useSettings();
   const [form, setForm] = useState(emptyForm);
   const [contact, setContact] = useState(settings);
   const [expandedProduct, setExpandedProduct] = useState<string | null>(null);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    setIsAuthenticated(window.sessionStorage.getItem(ADMIN_SESSION_KEY) === "true");
+  }, []);
+
+  const login = (event: FormEvent) => {
+    event.preventDefault();
+    if (username === "A@M" && password === "1111") {
+      window.sessionStorage.setItem(ADMIN_SESSION_KEY, "true");
+      setIsAuthenticated(true);
+      setLoginError(false);
+      return;
+    }
+    setLoginError(true);
+  };
+
+  const logout = () => {
+    window.sessionStorage.removeItem(ADMIN_SESSION_KEY);
+    setIsAuthenticated(false);
+    setUsername("");
+    setPassword("");
+  };
 
   const onImageFiles = (files: FileList) => {
     const selectedFiles = Array.from(files);
@@ -153,10 +181,66 @@ function Admin() {
     );
   };
 
+  if (!isAuthenticated) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-background px-4 py-10">
+        <form
+          onSubmit={login}
+          className="w-full max-w-sm space-y-5 rounded-2xl border border-border bg-card p-6 shadow-soft"
+        >
+          <div className="text-center">
+            <p className="text-sm font-semibold text-primary">A @ M</p>
+            <h1 className="mt-2 font-display text-2xl font-bold">تسجيل دخول الأدمن</h1>
+          </div>
+          <Field label="اسم المستخدم">
+            <input
+              className={inputCls}
+              autoComplete="username"
+              required
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+            />
+          </Field>
+          <Field label="كلمة المرور">
+            <input
+              className={inputCls}
+              type="password"
+              autoComplete="current-password"
+              required
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+            />
+          </Field>
+          {loginError ? (
+            <p role="alert" className="text-sm text-destructive">
+              اسم المستخدم أو كلمة المرور غير صحيحة
+            </p>
+          ) : null}
+          <button
+            type="submit"
+            className="w-full rounded-xl bg-primary px-4 py-3 font-semibold text-primary-foreground transition-opacity hover:opacity-90"
+          >
+            تسجيل الدخول
+          </button>
+        </form>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <main className="mx-auto max-w-6xl px-4 py-10">
-        <h1 className="font-display text-3xl font-bold">لوحة الإدارة</h1>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="font-display text-3xl font-bold">لوحة الإدارة</h1>
+          <button
+            type="button"
+            onClick={logout}
+            className="inline-flex items-center gap-2 rounded-xl border border-border px-4 py-2 text-sm font-semibold transition-colors hover:bg-accent"
+          >
+            <LogOut className="h-4 w-4" />
+            تسجيل الخروج
+          </button>
+        </div>
 
         <div className="mt-8 grid gap-8 lg:grid-cols-[1fr_1.2fr]">
           <form
